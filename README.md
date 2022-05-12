@@ -21,6 +21,6 @@ Build the project with debug profile to enable debug console.
 ![](dbg_console.png)  
 
 # 日本人
-https://github.com/d42ejh/sbx-tool-dll
-まあ居ないと思いますが機能追加も歓迎です。
+https://github.com/d42ejh/sbx-tool-dll  
+居ないと思いますが機能追加も歓迎です!  
 なにか質問があればissuesかメールにおねがいします。

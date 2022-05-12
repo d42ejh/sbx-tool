@@ -4,5 +4,9 @@ Dll hack for Twinkle ☆ Crusaders -Starlit Brave Xtream!!-  (version [1.19](htt
 [vndb](https://vndb.org/v5937)  
 [official](https://lillian.jp/kurukuru2/sbx.html)
 
+
+### Debug Console
+Build project with debug profile to enable a debug console.  
+![](debug_console.png)  
 # a
 https://github.com/d42ejh/sbx-tool-dll

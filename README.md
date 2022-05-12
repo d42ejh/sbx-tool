@@ -22,7 +22,7 @@ Build the project with debug profile to enable debug console.
 
 # TODOs  
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
-- [ ] Reverse wndproc's functions
+- [ ] Reverse wndproc
 - [ ] .
 
 # 日本人

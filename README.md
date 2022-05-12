@@ -20,6 +20,11 @@ TODO
 Build the project with debug profile to enable debug console.  
 ![](dbg_console.png)  
 
+# TODOs  
+- [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
+- [ ] Reverse wndproc's functions
+- [ ] .
+
 # 日本人
 https://github.com/d42ejh/sbx-tool-dll  
 居ないと思いますが機能追加も歓迎です!  

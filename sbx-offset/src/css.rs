@@ -1,0 +1,4 @@
+/*CSS */
+pub const VS_CPU_CSS_CONTEXT_OFFSET: usize = 0x442af8;
+pub const ADD_CHARACTER_COST_TO_PARTY_COST_OFFSET: usize = 0xe6ba0;
+pub const VS_CPU_CSS_INIT_CONTEXT_CONSTANTS_OFFSET: usize = 0xe4650;

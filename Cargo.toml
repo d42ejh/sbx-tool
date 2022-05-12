@@ -1,0 +1,10 @@
+[workspace]
+members=["sbx-tool-core","sbx-tool-dll","sbx-offset"]
+
+[profile.release]
+opt-level = 3 
+overflow-checks = false
+debug = false
+lto= 'fat'
+panic='abort'
+strip = "debuginfo"

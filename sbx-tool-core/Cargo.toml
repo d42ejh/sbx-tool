@@ -1,0 +1,18 @@
+[package]
+name = "sbx-tool-core"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+[target.'cfg(windows)'.dependencies]
+sbx-offset={path="../sbx-offset"}
+anyhow = "1.0.56"
+winapi = { version = "0.3.9", features = ["winuser", "minwindef", "libloaderapi", "memoryapi", "consoleapi", "winnt",
+    "tlhelp32","d3d9", "handleapi", "processthreadsapi", "impl-default", "errhandlingapi", "basetsd", "psapi"] }
+detour = "0.8.1"
+#yara = {version="0.13.0",features=["vendored"]}
+nameof = "1.2.2"
+tracing = "0.1.32"
+ilhook = "1.3"

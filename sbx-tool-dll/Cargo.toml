@@ -1,0 +1,36 @@
+[package]
+name = "sbx-tool-dll"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# build as dll
+[lib]
+crate-type = ["cdylib"] 
+
+
+[dependencies]
+[target.'cfg(windows)'.dependencies]
+sbx-offset={path="../sbx-offset"}
+sbx-tool-core={path="../sbx-tool-core"}
+ansi_term = "0.12.1"
+anyhow = "1.0.56"
+tracing = "0.1.32"
+tracing-subscriber = "0.3.9"
+tracing-appender = "0.2.*"
+winapi = { version = "0.3.9", features = ["winuser", "minwindef", "libloaderapi", "memoryapi", "consoleapi", "winnt",
+    "d3d9","tlhelp32", "handleapi", "processthreadsapi", "impl-default", "errhandlingapi", "basetsd", "psapi"] }
+detour = "0.8.1"
+nameof = "1.2.2"
+lazy_static = "1.4.0"
+parking_lot = { version = "0.12", features = ["nightly"] }
+
+imgui = "0.8.2"
+imgui-dx9-renderer = "0.8.0"
+#imgui-impl-win32-rs={git="https://github.com/super-continent/imgui-impl-win32-rs"}
+imgui-impl-win32-rs={path="../imgui-impl-win32-rs"}
+winit = "0.26.1"
+imgui-winit-support = "0.8"
+
+ilhook = "1.3"

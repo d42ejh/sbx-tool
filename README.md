@@ -4,6 +4,9 @@ Dll hack for Twinkle ☆ Crusaders -Starlit Brave Xtream!!-  (version [1.19](htt
 [vndb](https://vndb.org/v5937)  
 [official](https://lillian.jp/kurukuru2/sbx.html)
 
+Still work in progress.
+Written in [Rust](https://www.rust-lang.org/) language.
+
 # Special Thanks  
 Thank you for the high quality libraries.  
 [imgui](https://github.com/ocornut/imgui) by [ocornut](https://github.com/ocornut) and its [Rust binding](https://github.com/imgui-rs/imgui-rs)  

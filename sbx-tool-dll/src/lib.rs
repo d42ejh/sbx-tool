@@ -58,7 +58,6 @@ lazy_static! {
     static ref GraphicContext: Arc<Mutex<Option<Context>>> = Arc::new(Mutex::new(None));
 }
 
-// Originally thiscall which is equivalent to fastcall (ecx(rcx),...)
 type FnReset = extern "stdcall" fn(*mut IDirect3DDevice9, *mut D3DPRESENT_PARAMETERS) -> HRESULT;
 type FnEndScene = extern "stdcall" fn(*mut IDirect3DDevice9) -> HRESULT;
 

@@ -13,6 +13,9 @@ Thank you for the high quality libraries.
 [ilhook-rs](https://github.com/regomne/ilhook-rs) by [regomne](https://github.com/regomne)  
 [imgui-impl-win32-rs](https://github.com/super-continent/imgui-impl-win32-rs) by [super-continent](https://github.com/super-continent)  
 
+# Build
+TODO
+
 ### Debug Console
 Build the project with debug profile to enable debug console.  
 ![](dbg_console.png)  

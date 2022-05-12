@@ -475,7 +475,6 @@ enum MemPatchName {
 }
 
 fn attached_main() -> anyhow::Result<()> {
-    //spawn thread
 
     //disable log for release
     if cfg!(debug_assertions) {

@@ -16,5 +16,8 @@ Thank you for the high quality libraries.
 ### Debug Console
 Build the project with debug profile to enable debug console.  
 ![](dbg_console.png)  
-# a
+
+# 日本人
 https://github.com/d42ejh/sbx-tool-dll
+まあ居ないと思いますが機能追加も歓迎です。
+なにか質問があればissuesかメールにおねがいします。

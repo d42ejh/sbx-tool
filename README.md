@@ -13,8 +13,17 @@ Thank you for the high quality libraries.
 [ilhook-rs](https://github.com/regomne/ilhook-rs) by [regomne](https://github.com/regomne)  
 [imgui-impl-win32-rs](https://github.com/super-continent/imgui-impl-win32-rs) by [super-continent](https://github.com/super-continent)  
 
-# Build
-TODO
+# How To Build(WIP)
+## 1
+Install rust tool chains.
+https://rustup.rs/
+
+## 2 
+Install rust nightly
+
+## 3
+todo
+
 
 ### Debug Console
 Build the project with debug profile to enable debug console.  

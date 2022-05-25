@@ -41,7 +41,7 @@ pub fn init_main_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 }
 
 /// sbx main message loop
-extern "cdecl" fn __hook___main_loop_inner(regs: *mut Registers, _: usize) {
+extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
     //https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagea
     /* MSG
        hwnd: HWND,

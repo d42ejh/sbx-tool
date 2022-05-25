@@ -474,7 +474,6 @@ enum MemPatchName {
 }
 
 fn attached_main() -> anyhow::Result<()> {
-
     //disable log for release
     if cfg!(debug_assertions) {
         unsafe { AllocConsole() };

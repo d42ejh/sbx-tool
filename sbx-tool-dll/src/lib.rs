@@ -491,6 +491,14 @@ fn attached_main() -> anyhow::Result<()> {
             .init();
     }
 
+    //winapi stuffs
+    //winapi_mon::fs::hook_ReadFile()?;
+    winapi_mon::fs::hook_GetFinalPathNameByHandleA()?;
+    winapi_mon::memory::hook_LoadLibraryA()?;
+    winapi_mon::fs::hook_CreateFileA()?;
+    //winapi_mon::sys::hook_Sleep()?; //annoying
+
+
     event!(Level::INFO, "Initialized the logger!");
 
     let d3d_module_address = sbx_tool_core::utility::get_module_handle("d3d9.dll")? as usize;

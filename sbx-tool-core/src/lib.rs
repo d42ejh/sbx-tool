@@ -33,7 +33,7 @@ pub fn init_main_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 
     let hooker = Hooker::new(
         main_loop_inner_address,
-        HookType::JmpBack(__hook___main_loop_inner),
+        HookType::JmpBack(__hook__main_loop_inner),
         CallbackOption::None,
         HookFlags::empty(),
     );
@@ -65,7 +65,16 @@ extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
                 msg.wParam,
                 msg.lParam
             );
+        } else {
+            event!(
+                Level::INFO,
+                "Message {}, wParam {}, lParam {}",
+                msg.message,
+                msg.wParam,
+                msg.lParam
+            );
         }
+
         //for now ignore other messages(keystates)
     }
 }

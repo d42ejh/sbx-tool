@@ -47,8 +47,10 @@ pub struct PlayerSubParamStunClass {
                               // mb_bgm:[u8] //+38 not sure
 }
 
-//still not sure what are those
-//pointers sometimes suddenly 'freed' by client
+/// incomplete
+/// still not sure what are those
+/// pointers sometimes suddenly 'freed' by client
+/// sbxmodule.ext + 0x4402A0
 #[repr(C)]
 pub struct UnkContext {
     pub sub_context_ptr: *mut UnkContextSub,

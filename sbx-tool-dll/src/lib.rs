@@ -474,7 +474,6 @@ enum MemPatchName {
 }
 
 fn attached_main() -> anyhow::Result<()> {
-
     //disable log for release
     if cfg!(debug_assertions) {
         unsafe { AllocConsole() };
@@ -491,6 +490,14 @@ fn attached_main() -> anyhow::Result<()> {
             // sets this to be the default, global collector for this application.
             .init();
     }
+
+    //winapi stuffs
+    //winapi_mon::fs::hook_ReadFile()?;
+    winapi_mon::fs::hook_GetFinalPathNameByHandleA()?;
+    winapi_mon::memory::hook_LoadLibraryA()?;
+    winapi_mon::fs::hook_CreateFileA()?;
+    //winapi_mon::sys::hook_Sleep()?; //annoying
+
 
     event!(Level::INFO, "Initialized the logger!");
 

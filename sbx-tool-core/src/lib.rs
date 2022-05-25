@@ -17,6 +17,7 @@ use tracing::{event, Level};
 use winapi::shared::minwindef::{DWORD, LPVOID};
 use winapi::shared::ntdef::NULL;
 use winapi::shared::windef::HWND;
+use winapi::shared::windowsx::GET_X_LPARAM;
 use winapi::um::libloaderapi::GetModuleHandleA;
 use winapi::um::memoryapi::VirtualProtect;
 use winapi::um::winnt::PAGE_EXECUTE_READWRITE;
@@ -33,7 +34,7 @@ pub fn init_main_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 
     let hooker = Hooker::new(
         main_loop_inner_address,
-        HookType::JmpBack(__hook___main_loop_inner),
+        HookType::JmpBack(__hook__main_loop_inner),
         CallbackOption::None,
         HookFlags::empty(),
     );
@@ -41,7 +42,7 @@ pub fn init_main_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 }
 
 /// sbx main message loop
-extern "cdecl" fn __hook___main_loop_inner(regs: *mut Registers, _: usize) {
+extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
     //https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-peekmessagea
     /* MSG
        hwnd: HWND,
@@ -65,7 +66,31 @@ extern "cdecl" fn __hook___main_loop_inner(regs: *mut Registers, _: usize) {
                 msg.wParam,
                 msg.lParam
             );
+            return;
         }
-        //for now ignore other messages(keystates)
+        //non thread messages
+        match msg.message {
+            WM_MOUSEMOVE => {
+                /* 
+                let x_pos = GET_X_LPARAM(msg.lParam);
+                let y_pos = GET_X_LPARAM(msg.lParam);
+                event!(
+                    Level::DEBUG,
+                    "Mouse Move Message (x,y)=({},{})",
+                    x_pos,
+                    y_pos
+                );
+                */
+            }
+            _ => {
+                event!(
+                    Level::INFO,
+                    "Unknown Message {}, wParam {}, lParam {}",
+                    msg.message,
+                    msg.wParam,
+                    msg.lParam
+                );
+            }
+        }
     }
 }

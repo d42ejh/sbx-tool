@@ -1,0 +1,17 @@
+[package]
+name = "winapi-mon"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[target.'cfg(windows)'.dependencies]
+anyhow = "1.0.56"
+winapi = { version = "0.3.9", features = ["winuser", "minwindef", "libloaderapi", "memoryapi", "consoleapi", "winnt",
+  "fileapi", "winbase", "tlhelp32", "handleapi","synchapi", "processthreadsapi", "impl-default", "errhandlingapi", "basetsd", "psapi"] }
+detour = "0.8.1"
+lazy_static = "1.4.0"
+nameof = "1.2.2"
+tracing = "0.1.32"
+widestring= "0.5.1"
+

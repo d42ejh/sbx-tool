@@ -17,6 +17,7 @@ use tracing::{event, Level};
 use winapi::shared::minwindef::{DWORD, LPVOID};
 use winapi::shared::ntdef::NULL;
 use winapi::shared::windef::HWND;
+use winapi::shared::windowsx::GET_X_LPARAM;
 use winapi::um::libloaderapi::GetModuleHandleA;
 use winapi::um::memoryapi::VirtualProtect;
 use winapi::um::winnt::PAGE_EXECUTE_READWRITE;
@@ -65,16 +66,31 @@ extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
                 msg.wParam,
                 msg.lParam
             );
-        } else {
-            event!(
-                Level::INFO,
-                "Message {}, wParam {}, lParam {}",
-                msg.message,
-                msg.wParam,
-                msg.lParam
-            );
+            return;
         }
-
-        //for now ignore other messages(keystates)
+        //non thread messages
+        match msg.message {
+            WM_MOUSEMOVE => {
+                /* 
+                let x_pos = GET_X_LPARAM(msg.lParam);
+                let y_pos = GET_X_LPARAM(msg.lParam);
+                event!(
+                    Level::DEBUG,
+                    "Mouse Move Message (x,y)=({},{})",
+                    x_pos,
+                    y_pos
+                );
+                */
+            }
+            _ => {
+                event!(
+                    Level::INFO,
+                    "Unknown Message {}, wParam {}, lParam {}",
+                    msg.message,
+                    msg.wParam,
+                    msg.lParam
+                );
+            }
+        }
     }
 }

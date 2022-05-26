@@ -492,11 +492,11 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //winapi stuffs
-    //winapi_mon::fs::hook_ReadFile()?;
-    winapi_mon::fs::hook_GetFinalPathNameByHandleA()?;
-    winapi_mon::memory::hook_LoadLibraryA()?;
-    winapi_mon::fs::hook_CreateFileA()?;
-    //winapi_mon::sys::hook_Sleep()?; //annoying
+    //winapi_mon::fs::hook_ReadFile(None)?;
+    winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+    winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+    winapi_mon_core::fs::hook_CreateFileA(None)?;
+    //winapi_mon::sys::hook_Sleep(None)?; //annoying
 
 
     event!(Level::INFO, "Initialized the logger!");

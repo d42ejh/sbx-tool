@@ -492,12 +492,19 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //winapi stuffs
-    winapi_mon_core::fs::hook_ReadFile(None)?;
-    winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
-    winapi_mon_core::memory::hook_LoadLibraryA(None)?;
-    winapi_mon_core::fs::hook_CreateFileA(None)?;
-    winapi_mon_core::sys::hook_Sleep(None)?; //annoying
+    // winapi_mon_core::fs::hook_ReadFile(None)?;
+   
+    let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+    let detour = detour.read().unwrap();
+    unsafe { detour.enable() };
 
+    let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+    let detour = detour.read().unwrap();
+    unsafe { detour.enable() };
+
+    let detour = winapi_mon_core::fs::hook_CreateFileA(None)?;
+    let detour = detour.read().unwrap();
+    unsafe { detour.enable() };
 
     event!(Level::INFO, "Initialized the logger!");
 

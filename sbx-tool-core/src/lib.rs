@@ -71,7 +71,7 @@ extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
         //non thread messages
         match msg.message {
             WM_MOUSEMOVE => {
-                /* 
+                /*
                 let x_pos = GET_X_LPARAM(msg.lParam);
                 let y_pos = GET_X_LPARAM(msg.lParam);
                 event!(

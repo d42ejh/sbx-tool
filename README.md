@@ -31,7 +31,8 @@ Build the project with debug profile to enable debug console.
 
 # TODOs  
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
-- [ ] Reverse wndproc
+- [ ] Reverse bgm and se thread messages(inline hook PeekMessage and PostMessage)
+- [ ] Inline hook battle loop switch and identify cases
 - [ ] Figure out about 'character context'(where the client holds character informations such as a frame position.) [wip](https://github.com/d42ejh/sbx-tool/blob/450761f4b083f480ac790682bb5e311587863615/sbx-tool-core/src/battle/mod.rs#L50) Need more debug!
 
 # 日本人

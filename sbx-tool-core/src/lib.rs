@@ -61,7 +61,69 @@ extern "cdecl" fn __hook__main_loop_inner(regs: *mut Registers, _: usize) {
         if hwnd as usize == 0 {
             event!(
                 Level::INFO,
-                "ThreadMessage {}, wParam {}, lParam {}",
+                "[MAIN LOOP] ThreadMessage {}, wParam {}, lParam {}",
+                msg.message,
+                msg.wParam,
+                msg.lParam
+            );
+            return;
+        }
+        //non thread messages
+        match msg.message {
+            WM_MOUSEMOVE => {
+                /*
+                let x_pos = GET_X_LPARAM(msg.lParam);
+                let y_pos = GET_X_LPARAM(msg.lParam);
+                event!(
+                    Level::DEBUG,
+                    "Mouse Move Message (x,y)=({},{})",
+                    x_pos,
+                    y_pos
+                );
+                */
+            }
+            _ => {
+                event!(
+                    Level::INFO,
+                    "Unknown Message {}, wParam {}, lParam {}",
+                    msg.message,
+                    msg.wParam,
+                    msg.lParam
+                );
+            }
+        }
+    }
+}
+
+pub fn init_game_loop_inner_hook(module_address: usize) -> Result<Hooker> {
+    let game_loop_inner_address = module_address as usize + sbx_offset::GAME_LOOP_INNER_OFFSET;
+
+    event!(
+        Level::INFO,
+        "game loop inner address: {:x}",
+        game_loop_inner_address
+    );
+
+    let hooker = Hooker::new(
+        game_loop_inner_address,
+        HookType::JmpBack(__hook__game_loop_inner),
+        CallbackOption::None,
+        HookFlags::empty(),
+    );
+    Ok(hooker)
+}
+
+/// sbx main message loop
+extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
+    let mut msg: MSG = MSG::default();
+    let result = unsafe { PeekMessageA(&mut msg, 0 as HWND, 0, 0, 0) };
+    if result != 0 {
+        //message available
+        let hwnd = msg.hwnd;
+        if hwnd as usize == 0 {
+            event!(
+                Level::INFO,
+                "[GAME LOOP] ThreadMessage {}, wParam {}, lParam {}",
                 msg.message,
                 msg.wParam,
                 msg.lParam

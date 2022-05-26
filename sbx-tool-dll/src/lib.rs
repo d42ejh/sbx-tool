@@ -266,6 +266,7 @@ extern "stdcall" fn __hook__IDirect3DDevice9_EndScene(this: *mut IDirect3DDevice
 struct GUIContext {
     pub hide_ui: bool,
     main_loop_hook: Arc<HookPoint>,
+    game_loop_hook: Arc<HookPoint>,
     mem_patches: HashMap<MemPatchName, MemPatch>,
     css_context_address: usize,
     battle_context_address: usize,
@@ -493,19 +494,20 @@ fn attached_main() -> anyhow::Result<()> {
 
     //winapi stuffs
     // winapi_mon_core::fs::hook_ReadFile(None)?;
-   
-    let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
-    let detour = detour.read().unwrap();
-    unsafe { detour.enable() };
 
-    let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
-    let detour = detour.read().unwrap();
-    unsafe { detour.enable() };
+    /*
+        let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+        let detour = detour.read().unwrap();
+        unsafe { detour.enable() };
 
-    let detour = winapi_mon_core::fs::hook_CreateFileA(None)?;
-    let detour = detour.read().unwrap();
-    unsafe { detour.enable() };
+        let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+        let detour = detour.read().unwrap();
+        unsafe { detour.enable() };
 
+        let detour = winapi_mon_core::fs::hook_CreateFileA(None)?;
+        let detour = detour.read().unwrap();
+        unsafe { detour.enable() };
+    */
     event!(Level::INFO, "Initialized the logger!");
 
     let d3d_module_address = sbx_tool_core::utility::get_module_handle("d3d9.dll")? as usize;
@@ -584,6 +586,10 @@ fn attached_main() -> anyhow::Result<()> {
     let hook = sbx_tool_core::init_main_loop_inner_hook(module_address)?;
     let main_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
 
+    
+    let hook = sbx_tool_core::init_game_loop_inner_hook(module_address)?;
+    let game_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
+    
     event!(Level::INFO, "Initializing MemPatches");
     let mut mempatch_map = HashMap::new();
 
@@ -611,6 +617,7 @@ fn attached_main() -> anyhow::Result<()> {
             hide_ui: false,
             mem_patches: mempatch_map,
             main_loop_hook: main_loop_hookpoint,
+            game_loop_hook: game_loop_hookpoint,
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
             windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0xdc).to_rgba_f32s(),

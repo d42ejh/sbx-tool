@@ -11,3 +11,4 @@ pub const IDirect3DDevice9_Reset_Offset: usize = 0xe4480;
 //SBX offsets
 /*main*/
 pub const MAIN_LOOP_INNER_OFFSET: usize = 0x61F13;
+pub const GAME_LOOP_INNER_OFFSET: usize = 0x61f00;

@@ -492,11 +492,11 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //winapi stuffs
-    //winapi_mon::fs::hook_ReadFile()?;
-    winapi_mon::fs::hook_GetFinalPathNameByHandleA()?;
-    winapi_mon::memory::hook_LoadLibraryA()?;
-    winapi_mon::fs::hook_CreateFileA()?;
-    //winapi_mon::sys::hook_Sleep()?; //annoying
+    winapi_mon_core::fs::hook_ReadFile(None)?;
+    winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+    winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+    winapi_mon_core::fs::hook_CreateFileA(None)?;
+    winapi_mon_core::sys::hook_Sleep(None)?; //annoying
 
 
     event!(Level::INFO, "Initialized the logger!");
@@ -632,7 +632,6 @@ fn attached_main() -> anyhow::Result<()> {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-/*pub unsafe*/
 extern "system" fn DllMain(dll_module: HINSTANCE, call_reason: DWORD, _: LPVOID) -> BOOL {
     match call_reason {
         DLL_PROCESS_ATTACH => {

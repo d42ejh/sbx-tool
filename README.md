@@ -23,6 +23,8 @@ Release dll comes with better performance and small size.(But who cares?)
 ### Debug Console
 ![](dbg_console.png)  
 
+# Previews
+
 # How To Build(WIP)
 ## 1
 Install rust tool chains.

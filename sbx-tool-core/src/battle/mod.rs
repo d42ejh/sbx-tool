@@ -1,3 +1,7 @@
+use anyhow::Result;
+use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
+use tracing::{event, Level};
+
 #[repr(C)]
 pub struct BattleContext {
     pub player1_ptr: *mut PlayerClass, //+0
@@ -93,4 +97,30 @@ pub struct CharacterStatus {
     unk_24: u32,
     unk_28: u32,
     unk_2c: u32,
+}
+
+pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
+    let battle_loop_inner_address =
+        module_address as usize + sbx_offset::battle::BATTLE_MAIN_LOOP_FIRST_SWITCH_OFFSET;
+
+    event!(
+        Level::INFO,
+        "battle loop switch address: {:x}",
+        battle_loop_inner_address
+    );
+
+    let hooker = Hooker::new(
+        battle_loop_inner_address,
+        HookType::JmpBack(__hook__battle_loop_inner),
+        CallbackOption::None,
+        HookFlags::empty(),
+    );
+    Ok(hooker)
+}
+
+/// sbx main message loop
+extern "cdecl" fn __hook__battle_loop_inner(regs: *mut Registers, _: usize) {
+    event!(Level::INFO, "[Battle Main Loop] Switch Case: {}", unsafe {
+        (*regs).eax
+    });
 }

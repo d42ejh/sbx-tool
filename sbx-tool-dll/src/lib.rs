@@ -267,6 +267,7 @@ struct GUIContext {
     pub hide_ui: bool,
     main_loop_hook: Arc<HookPoint>,
     game_loop_hook: Arc<HookPoint>,
+    battle_loop_hook:Arc<HookPoint>,
     mem_patches: HashMap<MemPatchName, MemPatch>,
     css_context_address: usize,
     battle_context_address: usize,
@@ -586,10 +587,12 @@ fn attached_main() -> anyhow::Result<()> {
     let hook = sbx_tool_core::init_main_loop_inner_hook(module_address)?;
     let main_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
 
-    
     let hook = sbx_tool_core::init_game_loop_inner_hook(module_address)?;
     let game_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
-    
+
+    let hook = sbx_tool_core::battle::init_battle_loop_inner_hook(module_address)?;
+    let battle_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
+
     event!(Level::INFO, "Initializing MemPatches");
     let mut mempatch_map = HashMap::new();
 
@@ -618,6 +621,7 @@ fn attached_main() -> anyhow::Result<()> {
             mem_patches: mempatch_map,
             main_loop_hook: main_loop_hookpoint,
             game_loop_hook: game_loop_hookpoint,
+            battle_loop_hook:battle_loop_hookpoint,
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
             windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0xdc).to_rgba_f32s(),

@@ -111,7 +111,7 @@ static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf
     15u32 => "BATTLE_END_RESULT"
 };
 
-fn get_battle_main_loop_first_swithc_case_name(case: u32) -> &'static str {
+fn get_battle_main_loop_first_switch_case_name(case: u32) -> &'static str {
     match BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP.get(&case) {
         Some(n) => n,
         None => "Unknown",
@@ -143,7 +143,7 @@ extern "cdecl" fn __hook__battle_loop_inner(regs: *mut Registers, _: usize) {
     event!(
         Level::INFO,
         "[Battle Main Loop] Switch Case: {}({})",
-        get_battle_main_loop_first_swithc_case_name(case),
+        get_battle_main_loop_first_switch_case_name(case),
         case
     );
 }

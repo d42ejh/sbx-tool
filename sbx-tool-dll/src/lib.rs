@@ -466,6 +466,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
             });
         });
 
+    /*
     Window::new("test window")
         .size([200.0, 400.0], Condition::Once)
         .build(&ui, || {
@@ -478,6 +479,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                 ui.text("disabled");
             });
         });
+    */
 
     //enable/disable mem patches
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);

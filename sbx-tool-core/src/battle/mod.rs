@@ -1,5 +1,6 @@
 use anyhow::Result;
 use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
+use phf::{phf_map, Map};
 use tracing::{event, Level};
 
 #[repr(C)]
@@ -99,6 +100,24 @@ pub struct CharacterStatus {
     unk_2c: u32,
 }
 
+static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
+    0u32 => "BATTLE_INITIALIZE",
+    1u32 => "BATTLE_LOADING",
+    6u32 => "BATTLE_STARTDASH",//is there an official name for this?
+    8u32 => "BATTLE_FRAME_DRAWING",//is there an official name for this?
+    10u32 => "BATTLE_PLAYER_WAITING",
+    11u32 => "BATTLE_RUMBLE_LEADER_SELECTING",
+    13u32 => "BATTLE_ATTACK",
+    15u32 => "BATTLE_END_RESULT"
+};
+
+fn get_battle_main_loop_first_swithc_case_name(case: u32) -> &'static str {
+    match BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP.get(&case) {
+        Some(n) => n,
+        None => "Unknown",
+    }
+}
+
 pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
     let battle_loop_inner_address =
         module_address as usize + sbx_offset::battle::BATTLE_MAIN_LOOP_FIRST_SWITCH_OFFSET;
@@ -120,7 +139,11 @@ pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 
 /// sbx main message loop
 extern "cdecl" fn __hook__battle_loop_inner(regs: *mut Registers, _: usize) {
-    event!(Level::INFO, "[Battle Main Loop] Switch Case: {}", unsafe {
-        (*regs).eax
-    });
+    let case = unsafe { (*regs).eax };
+    event!(
+        Level::INFO,
+        "[Battle Main Loop] Switch Case: {}({})",
+        get_battle_main_loop_first_swithc_case_name(case),
+        case
+    );
 }

@@ -6,21 +6,12 @@ pub mod battle;
 pub mod css;
 pub mod d3d9;
 pub mod utility;
-use anyhow::anyhow;
 use anyhow::Result;
 use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
-use nameof::name_of;
-use std::arch::asm;
-use std::lazy::SyncOnceCell;
-use std::sync::Arc;
 use tracing::{event, Level};
 use winapi::shared::minwindef::{DWORD, LPVOID};
-use winapi::shared::ntdef::NULL;
+use std::sync::atomic::{AtomicU32, Ordering};
 use winapi::shared::windef::HWND;
-use winapi::shared::windowsx::GET_X_LPARAM;
-use winapi::um::libloaderapi::GetModuleHandleA;
-use winapi::um::memoryapi::VirtualProtect;
-use winapi::um::winnt::PAGE_EXECUTE_READWRITE;
 use winapi::um::winuser::{PeekMessageA, LPMSG, MSG};
 
 pub fn init_main_loop_inner_hook(module_address: usize) -> Result<Hooker> {
@@ -155,4 +146,38 @@ extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
             }
         }
     }
+}
+
+static UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
+
+
+pub fn init_ui_loop_inner_hook(module_address: usize) -> Result<Hooker> {
+    let ui_loop_inner_address = module_address as usize + sbx_offset::UI_LOOP_INNER_OFFSET;
+
+    event!(
+        Level::INFO,
+        "ui loop inner address: {:x}",
+        ui_loop_inner_address
+    );
+
+    let hooker = Hooker::new(
+        ui_loop_inner_address,
+        HookType::JmpBack(__hook__ui_loop_inner),
+        CallbackOption::None,
+        HookFlags::empty(),
+    );
+    Ok(hooker)
+}
+
+/// sbx main message loop
+extern "cdecl" fn __hook__ui_loop_inner(regs: *mut Registers, _: usize) {
+    let case = unsafe { (*regs).eax };
+    let prev_case = UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.load(Ordering::Relaxed);
+    if prev_case == case {
+        //To not spam log
+        return;
+    }
+    UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.store(case, Ordering::Relaxed);
+
+    event!(Level::INFO, "[UI Main Loop] Switch Case: {}", case);
 }

@@ -274,6 +274,8 @@ struct GUIContext {
     battle_context_address: usize,
     windowbg_color: [f32; 4],
     text_color: [f32; 4],
+    freeze_player_current_hp: bool,
+    freeze_player_current_hp_value: u32,
 }
 
 //we use mutex and taka care
@@ -366,13 +368,31 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     }
                     ui.text(format!("Player {:x}",player as usize));
                     let mut player_current_hp=unsafe{ (*player).current_hp}as i32;
-                    if  ui.input_int("Player HP",&mut player_current_hp ).step(500).step_fast(2000).build(){
+                    let changed=  ui.input_int("Player HP",&mut player_current_hp ).step(500).step_fast(2000).build();
+                    ui.same_line();
+                    ui.checkbox("Freeze",&mut ui_state.freeze_player_current_hp);
+                    if changed{
                     //change hp and its graphic variables
                         unsafe{(*player).current_hp= player_current_hp as u32};
                         //unsafe{(*player).graphic_hp1= player_current_hp as u32};
                         //unsafe{(*player).graphic_hp2= player_current_hp as u32};
                         //unsafe{(*player).graphic_hp3= player_current_hp as u32};
+                        ui_state.freeze_player_current_hp_value=player_current_hp as u32;
                     }
+
+                    //freeze
+                    if ui_state.freeze_player_current_hp{
+
+                      //  freeze_player_current_hp_value is initialized with u32::MAX
+                      // If user checked freeze without modifying player hp input_int box, then freeze_player_current_hp_value is u32::MAX
+                      // while input_int's value is real player hp
+                     //need to do this deal with that  
+                        if ui_state.freeze_player_current_hp_value==u32::MAX{
+                            ui_state.freeze_player_current_hp_value=player_current_hp as u32;
+                        }
+                        unsafe{(*player).current_hp= ui_state.freeze_player_current_hp_value};
+                    }
+
                     let mut player_current_ex=unsafe{ (*player_subparams).current_ex};
                     if ui.input_int("Player Ex",&mut player_current_ex).step(30).step_fast(100).build(){
                     //change ex and its graphic variables
@@ -446,11 +466,10 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
             });
         });
 
-    /*
-
     Window::new("test window")
         .size([200.0, 400.0], Condition::Once)
         .build(&ui, || {
+            ui.columns(3, "col", true);
             let mut a = 32;
             ui.input_int("1", &mut a).build();
             ui.label_text("label", "tesxt");
@@ -459,8 +478,6 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                 ui.text("disabled");
             });
         });
-
-    */
 
     //enable/disable mem patches
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
@@ -631,6 +648,8 @@ fn attached_main() -> anyhow::Result<()> {
             battle_context_address: battle_context_address,
             windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0x40).to_rgba_f32s(),
             text_color: imgui::ImColor32::from_rgba(0xff, 0x05, 0xf5, 0xff).to_rgba_f32s(),
+            freeze_player_current_hp: false,
+            freeze_player_current_hp_value: u32::MAX,
         });
     }
 

@@ -14,7 +14,14 @@ Thank you for the high quality libraries.
 [imgui-impl-win32-rs](https://github.com/super-continent/imgui-impl-win32-rs) by [super-continent](https://github.com/super-continent)  
 
 # Download
+[Debug dll](https://github.com/d42ejh/sbx-tool/raw/main/dlls/sbx_tool_dll_debug.dll)  
+[Release dll](https://github.com/d42ejh/sbx-tool/raw/main/dlls/sbx_tool_dll_release.dll)  
+  
+Debug dll comes with a debug console.  
+Release dll comes with better performance and small size.(But who cares?)  
 
+### Debug Console
+![](dbg_console.png)  
 
 # How To Build(WIP)
 ## 1
@@ -27,10 +34,6 @@ Install rust nightly
 ## 3
 todo
 
-
-### Debug Console
-Build the project with debug profile to enable debug console.  
-![](dbg_console.png)  
 
 # TODOs  
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)

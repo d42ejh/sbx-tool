@@ -13,6 +13,9 @@ Thank you for the high quality libraries.
 [ilhook-rs](https://github.com/regomne/ilhook-rs) by [regomne](https://github.com/regomne)  
 [imgui-impl-win32-rs](https://github.com/super-continent/imgui-impl-win32-rs) by [super-continent](https://github.com/super-continent)  
 
+# Download
+
+
 # How To Build(WIP)
 ## 1
 Install rust tool chains.
@@ -32,7 +35,8 @@ Build the project with debug profile to enable debug console.
 # TODOs  
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
 - [ ] Reverse bgm and se thread messages(inline hook PeekMessage and PostMessage)
-- [ ] Inline hook battle loop switch and identify cases
+- [ ] Inline hook battle loop switch and identify cases(Hook is done)
+- [ ] Reverse more with identified battle loop switch cases
 - [ ] Figure out about 'character context'(where the client holds character informations such as a frame position.) [wip](https://github.com/d42ejh/sbx-tool/blob/450761f4b083f480ac790682bb5e311587863615/sbx-tool-core/src/battle/mod.rs#L50) Need more debug!
 
 # 日本人

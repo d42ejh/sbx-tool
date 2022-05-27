@@ -1,3 +1,8 @@
+use anyhow::Result;
+use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
+use phf::{phf_map, Map};
+use std::sync::atomic::{AtomicU32, Ordering};
+use tracing::{event, Level};
 #[repr(C)]
 pub struct BattleContext {
     pub player1_ptr: *mut PlayerClass, //+0
@@ -93,4 +98,61 @@ pub struct CharacterStatus {
     unk_24: u32,
     unk_28: u32,
     unk_2c: u32,
+}
+
+static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
+static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
+    0u32 => "BATTLE_INITIALIZE",
+    1u32 => "BATTLE_LOADING",
+    6u32 => "BATTLE_STARTDASH",//is there an official name for this?
+    8u32 => "BATTLE_FRAME_DRAWING",
+    10u32 => "BATTLE_PLAYER_WAITING",
+    11u32 => "BATTLE_RUMBLE_LEADER_SELECT",
+    13u32 => "BATTLE_ATTACK",
+    15u32 => "BATTLE_END_RESULT",
+    19u32 => "BATTLE_ASK_RETRY"
+};
+
+fn get_battle_main_loop_first_switch_case_name(case: u32) -> &'static str {
+    match BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP.get(&case) {
+        Some(n) => n,
+        None => "Unknown",
+    }
+}
+
+pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
+    let battle_loop_inner_address =
+        module_address as usize + sbx_offset::battle::BATTLE_MAIN_LOOP_FIRST_SWITCH_OFFSET;
+
+    event!(
+        Level::INFO,
+        "battle loop switch address: {:x}",
+        battle_loop_inner_address
+    );
+
+    let hooker = Hooker::new(
+        battle_loop_inner_address,
+        HookType::JmpBack(__hook__battle_loop_inner),
+        CallbackOption::None,
+        HookFlags::empty(),
+    );
+    Ok(hooker)
+}
+
+/// sbx main message loop
+extern "cdecl" fn __hook__battle_loop_inner(regs: *mut Registers, _: usize) {
+    let case = unsafe { (*regs).eax };
+    let prev_case = BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.load(Ordering::Relaxed);
+    if prev_case == case {
+        //To not spam log
+        return;
+    }
+    BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.store(case, Ordering::Relaxed);
+
+    event!(
+        Level::INFO,
+        "[Battle Main Loop] Switch Case: {}({})",
+        get_battle_main_loop_first_switch_case_name(case),
+        case
+    );
 }

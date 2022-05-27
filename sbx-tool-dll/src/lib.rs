@@ -265,8 +265,10 @@ extern "stdcall" fn __hook__IDirect3DDevice9_EndScene(this: *mut IDirect3DDevice
 
 struct GUIContext {
     pub hide_ui: bool,
-    main_loop_hook: Arc<HookPoint>,
+    main_loop_hook: Arc<HookPoint>, //or Vec<HookPoint>
     game_loop_hook: Arc<HookPoint>,
+    battle_loop_hook: Arc<HookPoint>,
+    ui_loop_hook: Arc<HookPoint>,
     mem_patches: HashMap<MemPatchName, MemPatch>,
     css_context_address: usize,
     battle_context_address: usize,
@@ -586,10 +588,15 @@ fn attached_main() -> anyhow::Result<()> {
     let hook = sbx_tool_core::init_main_loop_inner_hook(module_address)?;
     let main_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
 
-    
     let hook = sbx_tool_core::init_game_loop_inner_hook(module_address)?;
     let game_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
-    
+
+    let hook = sbx_tool_core::battle::init_battle_loop_inner_hook(module_address)?;
+    let battle_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
+
+    let hook = sbx_tool_core::init_ui_loop_inner_hook(module_address)?;
+    let ui_loop_hookpoint = Arc::new(unsafe { hook.hook() }?);
+
     event!(Level::INFO, "Initializing MemPatches");
     let mut mempatch_map = HashMap::new();
 
@@ -618,9 +625,11 @@ fn attached_main() -> anyhow::Result<()> {
             mem_patches: mempatch_map,
             main_loop_hook: main_loop_hookpoint,
             game_loop_hook: game_loop_hookpoint,
+            ui_loop_hook: ui_loop_hookpoint,
+            battle_loop_hook: battle_loop_hookpoint,
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
-            windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0xdc).to_rgba_f32s(),
+            windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0x40).to_rgba_f32s(),
             text_color: imgui::ImColor32::from_rgba(0xff, 0x05, 0xf5, 0xff).to_rgba_f32s(),
         });
     }

@@ -629,7 +629,7 @@ fn attached_main() -> anyhow::Result<()> {
             battle_loop_hook: battle_loop_hookpoint,
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
-            windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0xdc).to_rgba_f32s(),
+            windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0x40).to_rgba_f32s(),
             text_color: imgui::ImColor32::from_rgba(0xff, 0x05, 0xf5, 0xff).to_rgba_f32s(),
         });
     }

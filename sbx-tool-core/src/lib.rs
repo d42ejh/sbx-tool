@@ -8,6 +8,7 @@ pub mod d3d9;
 pub mod utility;
 use anyhow::Result;
 use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
+use phf::{phf_map, Map};
 use std::sync::atomic::{AtomicU32, Ordering};
 use tracing::{event, Level};
 use winapi::shared::minwindef::{DWORD, LPVOID};
@@ -149,6 +150,24 @@ extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
 }
 
 static UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
+static UI_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
+    16u32 => "CONFIG",
+    17u32 => "SAVE_LOAD",
+    19u32 => "ESCAPE",
+    22u32 => "BRAVE_MODE_SSS",
+    23u32 => "BRAVE_MODE_CSS",
+    24u32 => "VS_CPU_MODE_CSS",
+    25u32 => "VS_CPU_MODE_SSS",
+    26u32 => "BATTLE",
+
+};
+
+fn get_ui_main_loop_first_switch_case_name(case: u32) -> &'static str {
+    match UI_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP.get(&case) {
+        Some(n) => n,
+        None => "Unknown",
+    }
+}
 
 pub fn init_ui_loop_inner_hook(module_address: usize) -> Result<Hooker> {
     let ui_loop_inner_address = module_address as usize + sbx_offset::UI_LOOP_INNER_OFFSET;
@@ -178,5 +197,10 @@ extern "cdecl" fn __hook__ui_loop_inner(regs: *mut Registers, _: usize) {
     }
     UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.store(case, Ordering::Relaxed);
 
-    event!(Level::INFO, "[UI Main Loop] Switch Case: {}", case);
+    event!(
+        Level::INFO,
+        "[UI Main Loop] Switch Case: {}({})",
+        get_ui_main_loop_first_switch_case_name(case),
+        case
+    );
 }

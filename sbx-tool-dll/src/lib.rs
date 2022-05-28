@@ -275,7 +275,13 @@ struct GUIContext {
     windowbg_color: [f32; 4],
     text_color: [f32; 4],
     freeze_player_current_hp: bool,
-    freeze_player_current_hp_value: u32,
+    freeze_player_current_hp_value: Option<u32>,
+    freeze_player_current_ex: bool,
+    freeze_player_current_ex_value: Option<i32>,
+    freeze_cpu_current_hp: bool,
+    freeze_cpu_current_hp_value: Option<u32>,
+    freeze_cpu_current_ex: bool,
+    freeze_cpu_current_ex_value: Option<i32>,
 }
 
 //we use mutex and taka care
@@ -322,23 +328,12 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                 TabItem::new("Status").build(&ui, || {
                     ui.bullet_text(format!("{} frames", ui.frame_count()));
                     ui.bullet_text(format!("{:.8} fps", ui.io().framerate));
-                //    ui.bullet_text(format!("{} vertices", ui.io().metrics_render_vertices));
-                 //   ui.bullet_text(format!("{} indices", ui.io().metrics_render_indices));
                 });
                 TabItem::new("CSS").build(&ui, || {
                     if css_context as usize == 0{
                         ui.text("Only available in vs-cpu character select screen.");
                         return;
                     }
-
-                    /*
-                    // looks like this does not have an effect, hp and ex are recalculated before battle 
-                    let mut player_hp=unsafe{ (*css_context).player_party_hp} as i32;
-                    if ui.input_int("Player HP", &mut player_hp ).build(){
-                        unsafe{ (*css_context).player_party_hp=player_hp as u32};
-
-                    }
-                    */
                     ui.checkbox("Ignore Party Cost", &mut is_enable_css_disable_cost_patch);
                     if ui.is_item_hovered() {
                         ui.tooltip_text(
@@ -367,87 +362,109 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                        return;
                     }
                     ui.text(format!("Player {:x}",player as usize));
+
+                    //Player HP
                     let mut player_current_hp=unsafe{ (*player).current_hp}as i32;
                     let changed=  ui.input_int("Player HP",&mut player_current_hp ).step(500).step_fast(2000).build();
                     ui.same_line();
-                    ui.checkbox("Freeze",&mut ui_state.freeze_player_current_hp);
+                    ui.checkbox("Freeze Player HP",&mut ui_state.freeze_player_current_hp);
                     if changed{
-                    //change hp and its graphic variables
+                    //change hp
                         unsafe{(*player).current_hp= player_current_hp as u32};
-                        //unsafe{(*player).graphic_hp1= player_current_hp as u32};
-                        //unsafe{(*player).graphic_hp2= player_current_hp as u32};
-                        //unsafe{(*player).graphic_hp3= player_current_hp as u32};
-                        ui_state.freeze_player_current_hp_value=player_current_hp as u32;
+                        ui_state.freeze_player_current_hp_value=Some(player_current_hp as u32) ;
                     }
 
                     //freeze
                     if ui_state.freeze_player_current_hp{
-
-                      //  freeze_player_current_hp_value is initialized with u32::MAX
-                      // If user checked freeze without modifying player hp input_int box, then freeze_player_current_hp_value is u32::MAX
-                      // while input_int's value is real player hp
-                     //need to do this deal with that  
-                        if ui_state.freeze_player_current_hp_value==u32::MAX{
-                            ui_state.freeze_player_current_hp_value=player_current_hp as u32;
+                        if ui_state.freeze_player_current_hp_value.is_none(){
+                            ui_state.freeze_player_current_hp_value=Some(player_current_hp as u32);
                         }
-                        unsafe{(*player).current_hp= ui_state.freeze_player_current_hp_value};
+                        unsafe{(*player).current_hp= ui_state.freeze_player_current_hp_value.unwrap()};
                     }
 
+                    //Player Ex
                     let mut player_current_ex=unsafe{ (*player_subparams).current_ex};
-                    if ui.input_int("Player Ex",&mut player_current_ex).step(30).step_fast(100).build(){
-                    //change ex and its graphic variables
+                    let changed= ui.input_int("Player Ex",&mut player_current_ex).step(30).step_fast(100).build();
+                    ui.same_line();
+                    ui.checkbox("Freeze Player Ex",&mut ui_state.freeze_player_current_ex);
+                    if changed{
+                    //change ex
                         unsafe{ (*player_subparams).current_ex =player_current_ex};
-                    //unsafe{ (*player_subparams).graphic_ex1=player_current_ex};
-                    //unsafe{ (*player_subparams).graphic_ex2=player_current_ex};
+                        ui_state.freeze_player_current_ex_value= Some(player_current_ex);
+                    };
 
-                   };
+                    if ui_state.freeze_player_current_ex{
+                        if ui_state.freeze_player_current_ex_value.is_none(){
+                            ui_state.freeze_player_current_ex_value=Some(player_current_ex);
+                        }
+                        unsafe{ (*player_subparams).current_ex =ui_state.freeze_player_current_ex_value.unwrap()};
+                    }
 
-                   //Player Rush Count
-                   let mut player_rush_count=unsafe{ (*battle_context).player1_rush_count} as i32;
-                   if ui.input_int("Player Rush Count",&mut player_rush_count).step_fast(5).build(){
-                   unsafe{ (*battle_context).player1_rush_count=player_rush_count as u32};
+                    //Player Rush Count
+                    let mut player_rush_count=unsafe{ (*battle_context).player1_rush_count} as i32;
+                    if ui.input_int("Player Rush Count",&mut player_rush_count).step_fast(5).build(){
+                    unsafe{ (*battle_context).player1_rush_count=player_rush_count as u32};
+                    }
 
-                   }
+                    //Player Score
+                    let mut player_score=unsafe{(*battle_context).player1_score} as i32;
+                    if ui.input_int("Player Score",&mut player_score).step(10000).step_fast(100000).build(){
+                    unsafe{ (*battle_context).player1_score=player_score as u32};
+                    }
 
-                   //Player Score
-                   let mut player_score=unsafe{(*battle_context).player1_score} as i32;
-                   if ui.input_int("Player Score",&mut player_score).step(10000).step_fast(100000).build(){
-                   unsafe{ (*battle_context).player1_score=player_score as u32};
-                   }
+                    //CPU
+                    ui.text(format!("CPU {:x}",cpu as usize));
+                    //CPU HP
+                    let mut cpu_current_hp=unsafe{ (*cpu).current_hp}as i32;
+                    let changed= ui.input_int("CPU HP", &mut cpu_current_hp).step(500).step_fast(2000).build();
+                    ui.same_line();
+                    ui.checkbox("Freeze CPU HP",&mut ui_state.freeze_cpu_current_hp);
+                    if changed {
+                    //change hp
+                        unsafe{(*cpu).current_hp= cpu_current_hp as u32};
+                        ui_state.freeze_cpu_current_hp_value=Some(cpu_current_hp as u32);
+                    }
+                    //freeze
+                    if ui_state.freeze_cpu_current_hp{
+                        if ui_state.freeze_cpu_current_hp_value.is_none(){
+                            ui_state.freeze_cpu_current_hp_value=Some(cpu_current_hp as u32);
+                        }
+                        unsafe{(*cpu).current_hp= ui_state.freeze_cpu_current_hp_value.unwrap()};
+                    }
+
+                    //CPU Ex
+                    let mut cpu_current_ex=unsafe{ (*cpu_subparams).current_ex};
+                    let changed= ui.input_int("CPU Ex",&mut cpu_current_ex).step(30).step_fast(100).build();
+                    ui.same_line();
+                    ui.checkbox("Freeze CPU Ex",&mut ui_state.freeze_cpu_current_ex);
+                    if changed{
+                    //change ex
+                        unsafe{ (*cpu_subparams).current_ex =cpu_current_ex};
+                        ui_state.freeze_cpu_current_ex_value= Some(cpu_current_ex);
+                    };
+
+                    //freeze
+                    if ui_state.freeze_cpu_current_ex{
+                        if ui_state.freeze_cpu_current_ex_value.is_none(){
+                            ui_state.freeze_cpu_current_ex_value=Some(cpu_current_ex);
+                        }
+                        unsafe{(*cpu_subparams).current_ex= ui_state.freeze_cpu_current_ex_value.unwrap()};
+                    }
 
 
-                   ui.text(format!("CPU {:x}",cpu as usize));
-                   let mut cpu_current_hp=unsafe{ (*cpu).current_hp}as i32;
-                   if ui.input_int("CPU HP", &mut cpu_current_hp).step(500).step_fast(2000).build(){
-                  //change hp and its graphic variables
-                  unsafe{(*cpu).current_hp= cpu_current_hp as u32};
-            //    unsafe{(*cpu).graphic_hp1= cpu_current_hp as u32};
-             //   unsafe{(*cpu).graphic_hp2= cpu_current_hp as u32};
-             //   unsafe{(*cpu).graphic_hp3= cpu_current_hp as u32};
 
-                   }
-                   let mut cpu_current_ex=unsafe{ (*cpu_subparams).current_ex};
-                   if ui.input_int("CPU Ex",&mut cpu_current_ex).step(30).step_fast(100).build(){
-                   //change ex and its graphic variables
-                   unsafe{ (*cpu_subparams).current_ex =cpu_current_ex};
-                   //unsafe{ (*cpu_subparams).graphic_ex1=cpu_current_ex};
-                   //unsafe{ (*cpu_subparams).graphic_ex2=cpu_current_ex};
+                    let mut cpu_rush_count=unsafe{ (*battle_context).player2_rush_count} as i32;
+                    if ui.input_int("CPU Rush Count",&mut cpu_rush_count).step_fast(5).build(){
+                        unsafe{ (*battle_context).player2_rush_count=cpu_rush_count as u32};
+                    }
 
-                   };
+                    //CPU Score
+                    let mut cpu_score=unsafe{(*battle_context).player2_score} as i32;
+                    if ui.input_int("CPU Score",&mut cpu_score).step(10000).step_fast(100000).build(){
+                        unsafe{ (*battle_context).player2_score=cpu_score as u32};
+                    }
 
-                   let mut cpu_rush_count=unsafe{ (*battle_context).player2_rush_count} as i32;
-                   if ui.input_int("CPU Rush Count",&mut cpu_rush_count).step_fast(5).build(){
-                   unsafe{ (*battle_context).player2_rush_count=cpu_rush_count as u32};
-
-                   }
-
-                   //CPU Score
-                   let mut cpu_score=unsafe{(*battle_context).player2_score} as i32;
-                   if ui.input_int("CPU Score",&mut cpu_score).step(10000).step_fast(100000).build(){
-                   unsafe{ (*battle_context).player2_score=cpu_score as u32};
-                   }
-
-                   ui.text("TODO add more fields");
+                    ui.text("TODO add more fields");
                 });
                 TabItem::new("Style").build(&ui, || {
                     let bg_ce = ColorEdit::new("Back Ground Color", windowbg_color);
@@ -651,7 +668,13 @@ fn attached_main() -> anyhow::Result<()> {
             windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0x40).to_rgba_f32s(),
             text_color: imgui::ImColor32::from_rgba(0xff, 0x05, 0xf5, 0xff).to_rgba_f32s(),
             freeze_player_current_hp: false,
-            freeze_player_current_hp_value: u32::MAX,
+            freeze_player_current_hp_value: None,
+            freeze_player_current_ex: false,
+            freeze_player_current_ex_value: None,
+            freeze_cpu_current_hp: false,
+            freeze_cpu_current_hp_value: None,
+            freeze_cpu_current_ex: false,
+            freeze_cpu_current_ex_value: None,
         });
     }
 

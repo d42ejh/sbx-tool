@@ -8,9 +8,9 @@ pub mod d3d9;
 pub mod utility;
 use anyhow::Result;
 use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
+use std::sync::atomic::{AtomicU32, Ordering};
 use tracing::{event, Level};
 use winapi::shared::minwindef::{DWORD, LPVOID};
-use std::sync::atomic::{AtomicU32, Ordering};
 use winapi::shared::windef::HWND;
 use winapi::um::winuser::{PeekMessageA, LPMSG, MSG};
 
@@ -149,7 +149,6 @@ extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
 }
 
 static UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
-
 
 pub fn init_ui_loop_inner_hook(module_address: usize) -> Result<Hooker> {
     let ui_loop_inner_address = module_address as usize + sbx_offset::UI_LOOP_INNER_OFFSET;

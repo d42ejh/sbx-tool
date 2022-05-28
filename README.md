@@ -21,7 +21,7 @@ Debug dll comes with a debug console.
 Release dll comes with better performance and small size.(But who cares?)  
 
 ### Debug Console
-![](dbg_console.png)  
+![](ss/dbg_console.png)  
 
 # How To Build(WIP)
 ## 1
@@ -32,10 +32,19 @@ https://rustup.rs/
 Install rust nightly
 
 ## 3
-todo
+todo  
+  
+  
+  
+# Change Log
+
+#### 2022/05/28
+![](ss/freeze.png)  
+Implemented freeze check box for battle hp and ex.  
 
 
 # TODOs  
+- [x] Freeze check box for player cpu hp, ex and etc(only player hp is done)
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
 - [ ] Reverse bgm and se thread messages(inline hook PeekMessage and PostMessage)
 - [ ] Inline hook battle loop switch and identify cases(Hook is done)

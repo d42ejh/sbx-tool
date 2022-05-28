@@ -36,7 +36,7 @@ todo
 
 
 # TODOs  
-- [ ] Freeze check box for player cpu hp, ex and etc(only player hp is done)
+- [x] Freeze check box for player cpu hp, ex and etc(only player hp is done)
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
 - [ ] Reverse bgm and se thread messages(inline hook PeekMessage and PostMessage)
 - [ ] Inline hook battle loop switch and identify cases(Hook is done)

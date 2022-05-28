@@ -1,6 +1,8 @@
 /*battle */
 pub const BATTLE_MAIN_LOOP_FIRST_SWITCH_OFFSET: usize = 0xC548e;
 
+pub const BATTLE_MAIN_LOOP_FIRST_SWITCH_FLAG_OFFSET: usize = 0x1c3370;
+
 pub const BATTLE_CONTEXT_OFFSET: usize = 0x438B28;
 
 pub const BATTLE_STUN_CONTEXT_OFFSET: usize = 0x4389A0;

@@ -1,8 +1,10 @@
 use anyhow::Result;
 use ilhook::x86::{CallbackOption, HookFlags, HookPoint, HookType, Hooker, Registers};
 use phf::{phf_map, Map};
+use std::lazy::SyncOnceCell;
 use std::sync::atomic::{AtomicU32, Ordering};
 use tracing::{event, Level};
+
 #[repr(C)]
 pub struct BattleContext {
     pub player1_ptr: *mut PlayerClass, //+0
@@ -99,7 +101,7 @@ pub struct CharacterStatus {
     unk_28: u32,
     unk_2c: u32,
 }
-
+static BATTLE_MAIN_LOOP_SWITCH_FLAG_ADDRESS: SyncOnceCell<usize> = SyncOnceCell::new();
 static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
 static BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
     0u32 => "BATTLE_INITIALIZE",
@@ -121,6 +123,10 @@ fn get_battle_main_loop_first_switch_case_name(case: u32) -> &'static str {
 }
 
 pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
+    BATTLE_MAIN_LOOP_SWITCH_FLAG_ADDRESS
+        .set(module_address + sbx_offset::battle::BATTLE_MAIN_LOOP_FIRST_SWITCH_FLAG_OFFSET)
+        .unwrap(); //lazy to handler the error, todo
+
     let battle_loop_inner_address =
         module_address as usize + sbx_offset::battle::BATTLE_MAIN_LOOP_FIRST_SWITCH_OFFSET;
 
@@ -141,7 +147,11 @@ pub fn init_battle_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 
 /// sbx main message loop
 extern "cdecl" fn __hook__battle_loop_inner(regs: *mut Registers, _: usize) {
-    let case = unsafe { (*regs).eax };
+    debug_assert!(BATTLE_MAIN_LOOP_SWITCH_FLAG_ADDRESS.get().is_some());
+
+    let flag_address = *BATTLE_MAIN_LOOP_SWITCH_FLAG_ADDRESS.get().unwrap();
+
+    let case = unsafe { *(flag_address as *const u32) };
     let prev_case = BATTLE_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.load(Ordering::Relaxed);
     if prev_case == case {
         //To not spam log

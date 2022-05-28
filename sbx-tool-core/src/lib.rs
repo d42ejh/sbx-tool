@@ -150,7 +150,7 @@ extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
     }
 }
 
-static UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS:SyncOnceCell<usize>=SyncOnceCell::new();
+static UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS: SyncOnceCell<usize> = SyncOnceCell::new();
 static UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
 static UI_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
     23u32 => "CONFIG",
@@ -171,11 +171,12 @@ fn get_ui_main_loop_first_switch_case_name(case: u32) -> &'static str {
 }
 
 pub fn init_ui_loop_inner_hook(module_address: usize) -> Result<Hooker> {
-    UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS.set(module_address+sbx_offset::UI_LOOP_SWITCH_FLAG_OFFSET).unwrap();//lazy to handler the error, todo
+    UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS
+        .set(module_address + sbx_offset::UI_LOOP_SWITCH_FLAG_OFFSET)
+        .unwrap(); //lazy to handler the error, todo
 
-    
     let ui_loop_inner_address = module_address as usize + sbx_offset::UI_LOOP_INNER_OFFSET;
-    
+
     event!(
         Level::INFO,
         "ui loop inner address: {:x}",
@@ -193,8 +194,8 @@ pub fn init_ui_loop_inner_hook(module_address: usize) -> Result<Hooker> {
 
 /// sbx main message loop
 extern "cdecl" fn __hook__ui_loop_inner(regs: *mut Registers, _: usize) {
-    let flag_address= *UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS.get().unwrap();//already initialized by init hook function
-    let case = unsafe { *(flag_address as * const u32 ) };
+    let flag_address = *UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS.get().unwrap(); //already initialized by init hook function
+    let case = unsafe { *(flag_address as *const u32) };
     let prev_case = UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE.load(Ordering::Relaxed);
     if prev_case == case {
         //To not spam log

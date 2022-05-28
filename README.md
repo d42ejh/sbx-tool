@@ -34,6 +34,10 @@ Install rust nightly
 ## 3
 todo
 
+# Change Log
+
+#### 2022/05/28
+Implemented freeze check box for battle hp and ex.
 
 # TODOs  
 - [x] Freeze check box for player cpu hp, ex and etc(only player hp is done)

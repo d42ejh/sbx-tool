@@ -38,6 +38,9 @@ todo
   
 # Change Log
 
+#### 2022/05/29
+Implemented ui loop switch case log.  (Sounds waste of time, but it eases further reversing!!)  
+
 #### 2022/05/28
 ![](ss/freeze.png)  
 Implemented freeze check box for battle hp and ex.  

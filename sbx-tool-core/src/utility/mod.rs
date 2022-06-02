@@ -114,7 +114,7 @@ pub fn find_process_window() -> Result<HWND> {
 
     unsafe { EnumWindows(Some(EnumWindowsCB), phwnd) };
     if hwnd.is_null() {
-        return Err(anyhow!("MapleStory window not found!(used EnumWindows)"));
+        return Err(anyhow!("Window not found!(used EnumWindows)"));
     }
     Ok(hwnd)
 }

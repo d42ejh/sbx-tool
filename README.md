@@ -57,4 +57,8 @@ Implemented freeze check box for battle hp and ex.
 # 日本人
 ~~https://github.com/d42ejh/sbx-tool-dll~~  
 居ないと思いますが機能追加も歓迎です!  
-なにか質問があればissuesかメールにおねがいします。
+  
+一緒に解析してくださる方はとりあえずの場所として↓でコミュニケーションしましょう。  
+最近はハナヒメ弄ってます。  
+https://github.com/d42ejh/hanahime-tool  
+[![Gitter](https://badges.gitter.im/sbx_hanahime_research/community.svg)](https://gitter.im/sbx_hanahime_research/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)  

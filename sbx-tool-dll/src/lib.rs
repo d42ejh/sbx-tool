@@ -119,7 +119,7 @@ extern "stdcall" fn __hook__IDirect3DDevice9_Reset(
 }
 
 extern "stdcall" fn __hook__IDirect3DDevice9_EndScene(this: *mut IDirect3DDevice9) -> HRESULT {
-    //  event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
+    event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
 
     //get trampoline
     let trampoline = match &EndSceneDetour.get() {
@@ -520,7 +520,7 @@ fn attached_main() -> anyhow::Result<()> {
 
         // let file_appender = tracing_appender::rolling::never("tmp", "sbx.log"); //uncommnet this to use file log
         tracing_subscriber::fmt()
-            //    .with_writer(file_appender) //uncommnet this to use file log
+            // .with_writer(file_appender) //uncommnet this to use file log
             .pretty()
             .with_thread_ids(true)
             .with_thread_names(true)
@@ -548,12 +548,14 @@ fn attached_main() -> anyhow::Result<()> {
     */
     event!(Level::INFO, "Initialized the logger!");
 
-    let d3d_module_address = sbx_tool_core::utility::get_module_handle("d3d9.dll")? as usize;
-
     //hook directx functions
     //get original directx function address
+    //get directx
+    let (d3d, d3d_device) = sbx_tool_core::d3d9::get_directx()?;
 
-    let reset_fn_address = d3d_module_address + sbx_offset::IDirect3DDevice9_Reset_Offset;
+    let end_scene_fn_address = sbx_tool_core::d3d9::get_vtable_value(d3d_device, 42);
+    let reset_fn_address = sbx_tool_core::d3d9::get_vtable_value(d3d_device, 16);
+
     event!(
         Level::INFO,
         "DirectX Reset function address: {:16x}",
@@ -580,7 +582,6 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //hook endscene
-    let end_scene_fn_address = d3d_module_address + sbx_offset::IDirect3DDevice9_EndScene_Offset;
     event!(
         Level::INFO,
         "DirectX EndScene function address: {:16x}",
@@ -703,7 +704,7 @@ extern "system" fn DllMain(dll_module: HINSTANCE, call_reason: DWORD, _: LPVOID)
     match call_reason {
         DLL_PROCESS_ATTACH => {
             unsafe { DisableThreadLibraryCalls(dll_module) };
-            attached_main().unwrap()
+            std::thread::spawn(|| attached_main().unwrap()); //need to spawn a new thread to create directx device
         }
         DLL_PROCESS_DETACH => (),
         _ => (),

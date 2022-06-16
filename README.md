@@ -18,7 +18,7 @@ Thank you for the high quality libraries.
 [Release dll](https://github.com/d42ejh/sbx-tool/raw/main/dlls/sbx_tool_dll_release.dll)  
   
 Debug dll comes with a debug console.  
-Release dll comes with better performance and small size.(But who cares?)  
+Release dll comes with no debug console and better performance and small binary size.~~(But who cares?)~~  
 
 ### Debug Console
 ![](ss/dbg_console.png)  
@@ -37,6 +37,9 @@ todo
   
   
 # Change Log
+
+#### 2022/6/16 15:16  
+Using a better way to get address of directx functions now.  
 
 #### 2022/05/29
 Implemented ui loop switch case log.  (Sounds waste of time, but it eases further reversing!!)  
@@ -58,5 +61,5 @@ Implemented freeze check box for battle hp and ex.
 ~~https://github.com/d42ejh/sbx-tool-dll~~  
 居ないと思いますが機能追加も歓迎です!  
   
-最近はハナヒメ弄ってます。  
-https://github.com/d42ejh/hanahime-tool  
+~~最近はハナヒメ弄ってます。  
+https://github.com/d42ejh/hanahime-tool~~  

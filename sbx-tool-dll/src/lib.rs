@@ -315,11 +315,6 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     let css_disable_cost_patch = mem_patches.get_mut(&MemPatchName::CSSDisableCost).unwrap();
     let mut is_enable_css_disable_cost_patch = css_disable_cost_patch.is_enabled();
 
-    //apply colors
-    let windowbg_color = &mut ui_state.windowbg_color;
-    let bg_color_stack = ui.push_style_color(StyleColor::WindowBg, *windowbg_color);
-    let text_color = &mut ui_state.text_color;
-    let text_color_stack = ui.push_style_color(StyleColor::Text, *text_color);
 
     Window::new("SBX Tool")
         .size([200.0, 400.0], Condition::Once)
@@ -467,11 +462,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     ui.text("TODO add more fields");
                 });
                 TabItem::new("Style").build(&ui, || {
-                    let bg_ce = ColorEdit::new("Back Ground Color", windowbg_color);
-                    bg_ce.build(&ui);
-
-                    let text_ce = ColorEdit::new("Text Color", text_color);
-                    text_ce.build(&ui);
+                    ui.show_default_style_editor();
                 });
                 TabItem::new("Information").build(&ui, || {
                     ui.text("Created by d42ejh");
@@ -501,9 +492,6 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     //enable/disable mem patches
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
 
-    //pop color stacks
-    bg_color_stack.pop();
-    text_color_stack.pop();
     ui
 }
 

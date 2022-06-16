@@ -119,7 +119,7 @@ extern "stdcall" fn __hook__IDirect3DDevice9_Reset(
 }
 
 extern "stdcall" fn __hook__IDirect3DDevice9_EndScene(this: *mut IDirect3DDevice9) -> HRESULT {
-    event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
+    // event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
 
     //get trampoline
     let trampoline = match &EndSceneDetour.get() {

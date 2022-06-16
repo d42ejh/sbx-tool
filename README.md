@@ -50,6 +50,7 @@ Implemented freeze check box for battle hp and ex.
 
 
 # TODOs  
+- [ ] Implement save & load imgui style(Need to hold imgui context with Arc<RwLock<>> since it is also used by endscene function) lazy af
 - [x] Freeze check box for player cpu hp, ex and etc(only player hp is done)
 - [ ] Reverse thread messages(main loop hook is already done, need to figure out about message it self)
 - [ ] Reverse bgm and se thread messages(inline hook PeekMessage and PostMessage)

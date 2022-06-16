@@ -460,6 +460,11 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     ui.text("TODO add more fields");
                 });
                 TabItem::new("Style").build(&ui, || {
+                    if ui.button("Save Style[TODO]"){
+                    }
+                    if ui.button("Load Style[TODO]"){
+                    }
+                    ui.spacing();
                     ui.show_default_style_editor();
                 });
                 TabItem::new("Information").build(&ui, || {
@@ -666,6 +671,7 @@ fn attached_main() -> anyhow::Result<()> {
     //imgui stuffs
     event!(Level::INFO, "Setting up imgui stuffs...");
     let imgui = imgui::Context::create();
+    
 
     {
         *GraphicContext.lock() = Some(Context {

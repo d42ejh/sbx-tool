@@ -51,6 +51,11 @@ unsafe extern "system" fn EnumWindowsCB(handle: HWND, lp: LPARAM) -> BOOL {
     TRUE
 }
 
+pub fn get_vtable_value(device_ptr: *const IDirect3DDevice9, table_index: usize) -> usize {
+    let delta = table_index * std::mem::size_of::<usize>();
+    unsafe { *(((*(device_ptr as *const usize)) + delta) as *const usize) }
+}
+
 pub fn get_directx() -> Result<(*mut IDirect3D9, *mut IDirect3DDevice9)> {
     event!(Level::INFO, "{}", name_of!(get_directx));
 
@@ -170,7 +175,9 @@ fn get_d3d_device(window_handle: HWND) -> Result<(*mut IDirect3D9, *mut IDirect3
         dummy_d3d_device_ptr as usize
     );
 
+    //todo maybe release later with
     //unsafe { d3d.as_ref().unwrap().Release() };
     // unsafe { dummy_d3d_device_ptr.as_ref().unwrap().Release() };
+
     Ok((d3d, dummy_d3d_device_ptr))
 }

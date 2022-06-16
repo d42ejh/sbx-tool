@@ -38,6 +38,9 @@ todo
   
 # Change Log
 
+#### 2022/6/16 15:16  
+Now using a better way to get address of directx functions.  
+
 #### 2022/05/29
 Implemented ui loop switch case log.  (Sounds waste of time, but it eases further reversing!!)  
 

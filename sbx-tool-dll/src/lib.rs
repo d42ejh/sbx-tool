@@ -119,7 +119,7 @@ extern "stdcall" fn __hook__IDirect3DDevice9_Reset(
 }
 
 extern "stdcall" fn __hook__IDirect3DDevice9_EndScene(this: *mut IDirect3DDevice9) -> HRESULT {
-    event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
+    // event!(Level::DEBUG, "EndScene hook called {:x}", this as usize);
 
     //get trampoline
     let trampoline = match &EndSceneDetour.get() {
@@ -272,8 +272,6 @@ struct GUIContext {
     mem_patches: HashMap<MemPatchName, MemPatch>,
     css_context_address: usize,
     battle_context_address: usize,
-    windowbg_color: [f32; 4],
-    text_color: [f32; 4],
     freeze_player_current_hp: bool,
     freeze_player_current_hp_value: Option<u32>,
     freeze_player_current_ex: bool,
@@ -315,11 +313,6 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     let css_disable_cost_patch = mem_patches.get_mut(&MemPatchName::CSSDisableCost).unwrap();
     let mut is_enable_css_disable_cost_patch = css_disable_cost_patch.is_enabled();
 
-    //apply colors
-    let windowbg_color = &mut ui_state.windowbg_color;
-    let bg_color_stack = ui.push_style_color(StyleColor::WindowBg, *windowbg_color);
-    let text_color = &mut ui_state.text_color;
-    let text_color_stack = ui.push_style_color(StyleColor::Text, *text_color);
 
     Window::new("SBX Tool")
         .size([200.0, 400.0], Condition::Once)
@@ -467,11 +460,12 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     ui.text("TODO add more fields");
                 });
                 TabItem::new("Style").build(&ui, || {
-                    let bg_ce = ColorEdit::new("Back Ground Color", windowbg_color);
-                    bg_ce.build(&ui);
-
-                    let text_ce = ColorEdit::new("Text Color", text_color);
-                    text_ce.build(&ui);
+                    if ui.button("Save Style[TODO]"){
+                    }
+                    if ui.button("Load Style[TODO]"){
+                    }
+                    ui.spacing();
+                    ui.show_default_style_editor();
                 });
                 TabItem::new("Information").build(&ui, || {
                     ui.text("Created by d42ejh");
@@ -501,9 +495,6 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     //enable/disable mem patches
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
 
-    //pop color stacks
-    bg_color_stack.pop();
-    text_color_stack.pop();
     ui
 }
 
@@ -666,8 +657,6 @@ fn attached_main() -> anyhow::Result<()> {
             battle_loop_hook: battle_loop_hookpoint,
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
-            windowbg_color: imgui::ImColor32::from_rgba(0x00, 0x03, 0x34, 0xda).to_rgba_f32s(),
-            text_color: imgui::ImColor32::from_rgba(0xff, 0x05, 0xf5, 0xff).to_rgba_f32s(),
             freeze_player_current_hp: false,
             freeze_player_current_hp_value: None,
             freeze_player_current_ex: false,
@@ -682,6 +671,7 @@ fn attached_main() -> anyhow::Result<()> {
     //imgui stuffs
     event!(Level::INFO, "Setting up imgui stuffs...");
     let imgui = imgui::Context::create();
+    
 
     {
         *GraphicContext.lock() = Some(Context {

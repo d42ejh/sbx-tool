@@ -35,3 +35,7 @@ winit = "0.26.1"
 imgui-winit-support = "0.8"
 
 ilhook = "1.3"
+
+# i will make this public later(lazy)
+#notify me if you want to build the project
+effbool={path="../../effbool"}

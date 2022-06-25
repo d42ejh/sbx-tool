@@ -37,6 +37,9 @@ todo
   
   
 # Change Log
+#### 2022/6/25 20:15
+Partially disabled max hp cap.(Unstable. Cause crash sometimes.)  
+
 
 #### 2022/6/25 13:53
 Refactored little.  
@@ -56,7 +59,7 @@ Implemented freeze check box for battle hp and ex.
 
 
 # TODOs  
-- [ ] disable max hp cap.(Found constants)
+- [ ] disable max hp cap.(Partially done.)
 - [x] ~~I found that hp fix is not working when imgui window is collapsed. Better spawn thread for hacks and use channel.~~
 - [ ] Implement save & load imgui style(Need to hold imgui context with Arc<RwLock<>> since it is also used by endscene function) lazy af
 - [x] ~~Freeze check box for player cpu hp, ex and etc(only player hp is done)~~

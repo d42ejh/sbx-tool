@@ -35,3 +35,5 @@ winit = "0.26.1"
 imgui-winit-support = "0.8"
 
 ilhook = "1.3"
+
+effbool={git="https://github.com/shiritaino/effbool"}

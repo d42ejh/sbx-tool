@@ -270,15 +270,12 @@ struct GUIContext {
     battle_loop_hook: Arc<HookPoint>,
     ui_loop_hook: Arc<HookPoint>,
     do_freeze_player_current_hp: EffBool,
+    do_freeze_player_current_ex: EffBool,
+    do_freeze_cpu_current_hp: EffBool,
+    do_freeze_cpu_current_ex: EffBool,
     mem_patches: HashMap<MemPatchName, MemPatch>,
     css_context_address: usize,
     battle_context_address: usize,
-    freeze_player_current_ex: bool,
-    freeze_player_current_ex_value: Option<i32>,
-    freeze_cpu_current_hp: bool,
-    freeze_cpu_current_hp_value: Option<u32>,
-    freeze_cpu_current_ex: bool,
-    freeze_cpu_current_ex_value: Option<i32>,
 }
 
 //we use mutex and taka care
@@ -377,19 +374,20 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     let mut player_current_ex=unsafe{ (*player_subparams).current_ex};
                     let changed= ui.input_int("Player Ex",&mut player_current_ex).step(30).step_fast(100).build();
                     ui.same_line();
-                    ui.checkbox("Freeze Player Ex",&mut ui_state.freeze_player_current_ex);
+                    let mut do_freeze_player_ex=  ui_state.do_freeze_player_current_ex.get();
+
+                    ui.checkbox("Freeze Player Ex",&mut do_freeze_player_ex);
                     if changed{
                     //change ex
-                        unsafe{ (*player_subparams).current_ex =player_current_ex};
-                        ui_state.freeze_player_current_ex_value= Some(player_current_ex);
+                        message_sender.send(ChannelMessage::ChangePlayerEx{value:player_current_ex }).unwrap();
                     };
 
-                    if ui_state.freeze_player_current_ex{
-                        if ui_state.freeze_player_current_ex_value.is_none(){
-                            ui_state.freeze_player_current_ex_value=Some(player_current_ex);
-                        }
-                        unsafe{ (*player_subparams).current_ex =ui_state.freeze_player_current_ex_value.unwrap()};
+                    let (is_changed,val)= ui_state.do_freeze_player_current_ex.set_and_is_changed(do_freeze_player_ex);
+                    if is_changed {
+                    //send freeze player ex message
+                        message_sender.send(ChannelMessage::FreezePlayerEx{enable:val}).unwrap();
                     }
+
 
                     //Player Rush Count
                     let mut player_rush_count=unsafe{ (*battle_context).player1_rush_count} as i32;
@@ -409,40 +407,38 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     let mut cpu_current_hp=unsafe{ (*cpu).current_hp}as i32;
                     let changed= ui.input_int("CPU HP", &mut cpu_current_hp).step(500).step_fast(2000).build();
                     ui.same_line();
-                    ui.checkbox("Freeze CPU HP",&mut ui_state.freeze_cpu_current_hp);
+                    let mut do_freeze_cpu_hp=  ui_state.do_freeze_cpu_current_hp.get();
+
+                    ui.checkbox("Freeze CPU HP",&mut do_freeze_cpu_hp);
                     if changed {
                     //change hp
-                        unsafe{(*cpu).current_hp= cpu_current_hp as u32};
-                        ui_state.freeze_cpu_current_hp_value=Some(cpu_current_hp as u32);
+                        message_sender.send(ChannelMessage::ChangeCPUHP{value:cpu_current_hp as u32}).unwrap();
                     }
-                    //freeze
-                    if ui_state.freeze_cpu_current_hp{
-                        if ui_state.freeze_cpu_current_hp_value.is_none(){
-                            ui_state.freeze_cpu_current_hp_value=Some(cpu_current_hp as u32);
-                        }
-                        unsafe{(*cpu).current_hp= ui_state.freeze_cpu_current_hp_value.unwrap()};
+
+
+                    let (is_changed,val)= ui_state.do_freeze_cpu_current_hp.set_and_is_changed(do_freeze_cpu_hp);
+                    if is_changed {
+                    //send freeze cpu hp message
+                        message_sender.send(ChannelMessage::FreezeCPUHP{enable:val}).unwrap();
                     }
+
 
                     //CPU Ex
                     let mut cpu_current_ex=unsafe{ (*cpu_subparams).current_ex};
                     let changed= ui.input_int("CPU Ex",&mut cpu_current_ex).step(30).step_fast(100).build();
                     ui.same_line();
-                    ui.checkbox("Freeze CPU Ex",&mut ui_state.freeze_cpu_current_ex);
+                    let mut do_freeze_cpu_ex=  ui_state.do_freeze_cpu_current_ex.get();
+                    ui.checkbox("Freeze CPU Ex",&mut do_freeze_cpu_ex);
                     if changed{
                     //change ex
-                        unsafe{ (*cpu_subparams).current_ex =cpu_current_ex};
-                        ui_state.freeze_cpu_current_ex_value= Some(cpu_current_ex);
+                        message_sender.send(ChannelMessage::ChangeCPUEx{value:cpu_current_ex }).unwrap();
                     };
 
-                    //freeze
-                    if ui_state.freeze_cpu_current_ex{
-                        if ui_state.freeze_cpu_current_ex_value.is_none(){
-                            ui_state.freeze_cpu_current_ex_value=Some(cpu_current_ex);
-                        }
-                        unsafe{(*cpu_subparams).current_ex= ui_state.freeze_cpu_current_ex_value.unwrap()};
+                    let (is_changed,val)= ui_state.do_freeze_cpu_current_ex.set_and_is_changed(do_freeze_cpu_ex);
+                    if is_changed {
+                    //send freeze cpu ex message
+                        message_sender.send(ChannelMessage::FreezeCPUEx{enable:val}).unwrap();
                     }
-
-
 
                     let mut cpu_rush_count=unsafe{ (*battle_context).player2_rush_count} as i32;
                     if ui.input_int("CPU Rush Count",&mut cpu_rush_count).step_fast(5).build(){
@@ -504,8 +500,13 @@ enum MemPatchName {
 #[derive(Debug)]
 enum ChannelMessage {
     ChangePlayerHP { value: u32 },
+    ChangePlayerEx { value: i32 },
     FreezePlayerHP { enable: bool },
-    ChangePlayerEx { value: u32 },
+    FreezePlayerEx { enable: bool },
+    ChangeCPUHP { value: u32 },
+    ChangeCPUEx { value: i32 },
+    FreezeCPUHP { enable: bool },
+    FreezeCPUEx { enable: bool },
 }
 
 fn attached_main() -> anyhow::Result<()> {
@@ -657,6 +658,14 @@ fn attached_main() -> anyhow::Result<()> {
     std::thread::spawn(move || {
         let mut do_freeze_player_hp = false;
         let mut freeeze_player_hp_value = 0x77777777;
+        let mut do_freeze_player_ex = false;
+        let mut freeeze_player_ex_value = 300;
+
+        let mut do_freeze_cpu_hp = false;
+        let mut freeeze_cpu_hp_value = 0x77777777;
+        let mut do_freeze_cpu_ex = false;
+        let mut freeeze_cpu_ex_value = 300;
+
         loop {
             // probably better let these out of the loop.
             // but got complex(for me!) ce, so I leave these as is.
@@ -689,11 +698,18 @@ fn attached_main() -> anyhow::Result<()> {
                     msg,
                     is_in_battle
                 );
+
                 match msg {
                     ChannelMessage::ChangePlayerHP { value } => {
                         if is_in_battle {
-                            event!(Level::DEBUG, "Change hp");
+                            //      event!(Level::DEBUG, "Change player hp");
                             unsafe { (*player).current_hp = value };
+                        }
+                    }
+                    ChannelMessage::ChangePlayerEx { value } => {
+                        if is_in_battle {
+                            //      event!(Level::DEBUG, "Change player ex");
+                            unsafe { (*player_subparams).current_ex = value };
                         }
                     }
                     ChannelMessage::FreezePlayerHP { enable } => {
@@ -702,7 +718,37 @@ fn attached_main() -> anyhow::Result<()> {
                             freeeze_player_hp_value = unsafe { (*player).current_hp };
                         }
                     }
-                    ChannelMessage::ChangePlayerEx { value } => {}
+                    ChannelMessage::FreezePlayerEx { enable } => {
+                        do_freeze_player_ex = enable;
+                        if is_in_battle {
+                            freeeze_player_ex_value = unsafe { (*player_subparams).current_ex };
+                        }
+                    }
+                    //CPU
+                    ChannelMessage::ChangeCPUHP { value } => {
+                        if is_in_battle {
+                            //     event!(Level::DEBUG, "Change cpu hp");
+                            unsafe { (*cpu).current_hp = value };
+                        }
+                    }
+                    ChannelMessage::ChangeCPUEx { value } => {
+                        if is_in_battle {
+                            //      event!(Level::DEBUG, "Change cpu ex");
+                            unsafe { (*cpu_subparams).current_ex = value };
+                        }
+                    }
+                    ChannelMessage::FreezeCPUHP { enable } => {
+                        do_freeze_cpu_hp = enable;
+                        if is_in_battle {
+                            freeeze_cpu_hp_value = unsafe { (*cpu).current_hp };
+                        }
+                    }
+                    ChannelMessage::FreezeCPUEx { enable } => {
+                        do_freeze_cpu_ex = enable;
+                        if is_in_battle {
+                            freeeze_cpu_ex_value = unsafe { (*cpu_subparams).current_ex };
+                        }
+                    }
                 }
             };
 
@@ -712,9 +758,38 @@ fn attached_main() -> anyhow::Result<()> {
             }
 
             //do stuffs
+            //player freeze
             if do_freeze_player_hp {
-                event!(Level::DEBUG,"Freeze HP: {}",freeeze_player_hp_value);
+                /*
+                event!(
+                    Level::DEBUG,
+                    "Freeze Player HP: {}",
+                    freeeze_player_hp_value
+                );
+                */
                 unsafe { (*player).current_hp = freeeze_player_hp_value };
+            }
+
+            if do_freeze_player_ex {
+                /*
+                event!(
+                    Level::DEBUG,
+                    "Freeze Player Ex: {}",
+                    freeeze_player_ex_value
+                );
+                */
+                unsafe { (*player_subparams).current_ex = freeeze_player_ex_value };
+            }
+
+            //cpu freeze
+            if do_freeze_cpu_hp {
+                //                event!(Level::DEBUG, "Freeze CPU HP: {}", freeeze_cpu_hp_value);
+                unsafe { (*cpu).current_hp = freeeze_cpu_hp_value };
+            }
+
+            if do_freeze_cpu_ex {
+                //  event!(Level::DEBUG, "Freeze CPU Ex: {}", freeeze_cpu_ex_value);
+                unsafe { (*cpu_subparams).current_ex = freeeze_cpu_ex_value };
             }
         }
     });
@@ -733,12 +808,9 @@ fn attached_main() -> anyhow::Result<()> {
             css_context_address: css_context_address,
             battle_context_address: battle_context_address,
             do_freeze_player_current_hp: EffBool::default(),
-            freeze_player_current_ex: false,
-            freeze_player_current_ex_value: None,
-            freeze_cpu_current_hp: false,
-            freeze_cpu_current_hp_value: None,
-            freeze_cpu_current_ex: false,
-            freeze_cpu_current_ex_value: None,
+            do_freeze_player_current_ex: EffBool::default(),
+            do_freeze_cpu_current_hp: EffBool::default(),
+            do_freeze_cpu_current_ex: EffBool::default(),
         });
     }
 

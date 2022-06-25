@@ -18,7 +18,7 @@ Thank you for the high quality libraries.
 [Release dll](https://github.com/d42ejh/sbx-tool/raw/main/dlls/sbx_tool_dll_release.dll)  
   
 Debug dll comes with a debug console.  
-Release dll comes with no debug console and better performance and small binary size.~~(But who cares?)~~  
+Release dll comes with no debug console and better runtime performance and small binary size.
 
 ### Debug Console
 ![](ss/dbg_console.png)  

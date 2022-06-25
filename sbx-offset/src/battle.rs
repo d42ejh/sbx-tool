@@ -10,3 +10,6 @@ pub const BATTLE_STUN_CONTEXT_OFFSET: usize = 0x4389A0;
 pub const BATTLE_ATTACK_LEVEL_CONTEXT_OFFSET: usize = 0x438DD8;
 
 pub const BATTLE_UNK_CONTEXT: usize = 0x4402A0;
+
+pub const HPCAP_1_OFFSET: usize = 0xBF2A2;
+pub const HPCAP_2_OFFSET: usize = 0xBF2B4;

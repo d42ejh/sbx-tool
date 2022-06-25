@@ -307,8 +307,10 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
         unsafe { std::mem::transmute(*(ui_state.css_context_address as *mut usize)) };
 
     //todo maybe need to lock ui
-    let css_disable_cost_patch = mem_patches.get_mut(&MemPatchName::CSSDisableCost).unwrap();
+    let css_disable_cost_patch = mem_patches.get(&MemPatchName::CSSDisableCost).unwrap();
     let mut is_enable_css_disable_cost_patch = css_disable_cost_patch.is_enabled();
+    let hp_cap_disable_patch = mem_patches.get(&MemPatchName::HPCapDisable).unwrap();
+    let mut is_enable_hp_cap_disable_patch = hp_cap_disable_patch.is_enabled();
 
     Window::new("SBX Tool")
         .size([200.0, 400.0], Condition::Once)
@@ -451,7 +453,9 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                         unsafe{ (*battle_context).player2_score=cpu_score as u32};
                     }
 
-                    ui.text("TODO add more fields");
+                    ui.checkbox("Disable HP Cap", &mut is_enable_hp_cap_disable_patch);
+
+
                 });
                 TabItem::new("Style").build(&ui, || {
                     if ui.button("Save Style[TODO]"){
@@ -471,23 +475,11 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
             });
         });
 
-    /*
-    Window::new("test window")
-        .size([200.0, 400.0], Condition::Once)
-        .build(&ui, || {
-            ui.columns(3, "col", true);
-            let mut a = 32;
-            ui.input_int("1", &mut a).build();
-            ui.label_text("label", "tesxt");
-            ui.new_line();
-            ui.disabled(true, || {
-                ui.text("disabled");
-            });
-        });
-    */
-
     //enable/disable mem patches
+    let css_disable_cost_patch = mem_patches.get_mut(&MemPatchName::CSSDisableCost).unwrap();
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
+    let hp_cap_disable_patch = mem_patches.get_mut(&MemPatchName::HPCapDisable).unwrap();
+    hp_cap_disable_patch.switch(is_enable_hp_cap_disable_patch);
 
     ui
 }
@@ -495,6 +487,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
 #[derive(Eq, PartialEq, Hash, Clone, Copy)]
 enum MemPatchName {
     CSSDisableCost,
+    HPCapDisable,
 }
 
 #[derive(Debug)]
@@ -634,11 +627,25 @@ fn attached_main() -> anyhow::Result<()> {
     event!(Level::INFO, "Initializing MemPatches");
     let mut mempatch_map = HashMap::new();
 
+    //character cost patch
     let patch = MemPatch::new(&[(
         module_address + sbx_offset::css::ADD_CHARACTER_COST_TO_PARTY_COST_OFFSET,
         &[0x90, 0x90, 0x90, 0x90],
     )]);
     mempatch_map.insert(MemPatchName::CSSDisableCost, patch);
+
+    //hp cap patch
+    let patch = MemPatch::new(&[
+        (
+            module_address + sbx_offset::battle::HPCAP_1_OFFSET,
+            &[0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90],
+        ),
+        (
+            module_address + sbx_offset::battle::HPCAP_2_OFFSET,
+            &[0x90, 0x90, 0x90, 0x90, 0x90],
+        ),
+    ]);
+    mempatch_map.insert(MemPatchName::HPCapDisable, patch);
 
     event!(Level::INFO, "Initializing SBX contexts");
     //CSS stuffs

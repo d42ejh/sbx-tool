@@ -38,6 +38,9 @@ todo
   
 # Change Log
 
+#### 2022/6/25 04:25
+Refactored little.  
+
 #### 2022/6/16 15:16  
 Using a better way to get address of directx functions now.  
 
@@ -60,8 +63,5 @@ Implemented freeze check box for battle hp and ex.
 - [ ] Figure out about 'character context'(where the client holds character informations such as a frame position.) [wip](https://github.com/d42ejh/sbx-tool/blob/450761f4b083f480ac790682bb5e311587863615/sbx-tool-core/src/battle/mod.rs#L50) Need more debug!
 
 # 日本人
-~~https://github.com/d42ejh/sbx-tool-dll~~  
 居ないと思いますが機能追加も歓迎です!  
   
-~~最近はハナヒメ弄ってます。  
-https://github.com/d42ejh/hanahime-tool~~  

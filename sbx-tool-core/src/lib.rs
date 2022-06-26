@@ -152,7 +152,7 @@ extern "cdecl" fn __hook__game_loop_inner(regs: *mut Registers, _: usize) {
 
 static UI_MAIN_LOOP_SWITCH_FLAG_ADDRESS: SyncOnceCell<usize> = SyncOnceCell::new();
 static UI_MAIN_LOOP_FIRST_SWITCH_CASE_BEFORE: AtomicU32 = AtomicU32::new(77777);
-static UI_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
+pub static UI_MAIN_LOOP_FIRST_SWITCH_CASE_NAME_MAP: Map<u32, &'static str> = phf_map! {
     23u32 => "CONFIG",
     24u32 => "SAVE_LOAD",
     26u32 => "ESCAPE",

@@ -311,7 +311,8 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     let mut is_enable_css_disable_cost_patch = css_disable_cost_patch.is_enabled();
     let hp_cap_disable_patch = mem_patches.get(&MemPatchName::HPCapDisable).unwrap();
     let mut is_enable_hp_cap_disable_patch = hp_cap_disable_patch.is_enabled();
-
+    let ex_cap_disable_patch = mem_patches.get(&MemPatchName::ExCapDisable).unwrap();
+    let mut is_enable_ex_cap_disable_patch = ex_cap_disable_patch.is_enabled();
     Window::new("SBX Tool")
         .size([200.0, 400.0], Condition::Once)
         .build(&ui, || {
@@ -454,6 +455,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     }
 
                     ui.checkbox("Disable HP Cap", &mut is_enable_hp_cap_disable_patch);
+                    ui.checkbox("Disable Ex Cap", &mut is_enable_ex_cap_disable_patch);
 
 
                 });
@@ -480,6 +482,8 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
     let hp_cap_disable_patch = mem_patches.get_mut(&MemPatchName::HPCapDisable).unwrap();
     hp_cap_disable_patch.switch(is_enable_hp_cap_disable_patch);
+    let ex_cap_disable_patch = mem_patches.get_mut(&MemPatchName::ExCapDisable).unwrap();
+    ex_cap_disable_patch.switch(is_enable_ex_cap_disable_patch);
 
     ui
 }
@@ -488,6 +492,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
 enum MemPatchName {
     CSSDisableCost,
     HPCapDisable,
+    ExCapDisable
 }
 
 #[derive(Debug)]
@@ -646,6 +651,19 @@ fn attached_main() -> anyhow::Result<()> {
         ),
     ]);
     mempatch_map.insert(MemPatchName::HPCapDisable, patch);
+    
+    //ex cap patch
+    let patch = MemPatch::new(&[
+        (
+            module_address + sbx_offset::battle::EXCAP_1_OFFSET,
+            &[0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90],
+        ),
+        (
+            module_address + sbx_offset::battle::EXCAP_2_OFFSET,
+            &[0x90, 0x90, 0x90],
+        ),
+    ]);
+    mempatch_map.insert(MemPatchName::ExCapDisable, patch);
 
     event!(Level::INFO, "Initializing SBX contexts");
     //CSS stuffs

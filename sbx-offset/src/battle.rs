@@ -14,5 +14,5 @@ pub const BATTLE_UNK_CONTEXT: usize = 0x4402A0;
 pub const HPCAP_1_OFFSET: usize = 0xBF2A2;
 pub const HPCAP_2_OFFSET: usize = 0xBF2B4;
 
-pub const EXCAP_1_OFFSET:usize=0xC391C;
-pub const EXCAP_2_OFFSET:usize=0xC392B;
+pub const EXCAP_1_OFFSET: usize = 0xC391C;
+pub const EXCAP_2_OFFSET: usize = 0xC392B;

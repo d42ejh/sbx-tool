@@ -28,11 +28,11 @@ pub struct BattleContext {
 pub struct PlayerClass {
     unk_0: u32,
     unk_4: u32,
-    pub initial_hp: u32, //+8,
-    pub current_hp: u32,
-    pub graphic_hp1: u32,
-    pub graphic_hp2: u32,
-    pub graphic_hp3: u32,
+    pub initial_hp: u32,     //+8,
+    pub current_hp: u32,     //+c
+    pub graphic_hp_end: u32, //+10
+    pub graphic_hp_start: u32,
+    pub graphic_hp_bar: u32,
 }
 
 #[repr(C)]
@@ -49,9 +49,9 @@ pub struct PlayerSubParamExClass {
 pub struct PlayerSubParamStunClass {
     unk_0: u32,
     unk_4: u32,
-    pub max_start_count: u32, //+8
-    pub current_start_count: u32, //+c
-                              // mb_bgm:[u8] //+38 not sure
+    pub max_stunstar_count: u32, //+8
+    pub current_stunstar_count: u32, //+c
+                                 // mb_bgm:[u8] //+38 not sure
 }
 
 /// incomplete

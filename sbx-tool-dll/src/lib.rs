@@ -492,7 +492,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
 enum MemPatchName {
     CSSDisableCost,
     HPCapDisable,
-    ExCapDisable
+    ExCapDisable,
 }
 
 #[derive(Debug)]
@@ -526,21 +526,18 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //winapi stuffs
-    // winapi_mon_core::fs::hook_ReadFile(None)?;
 
     /*
-        let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
+            let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+            let detour = detour.read().unwrap();
+            unsafe { detour.enable() };
 
-        let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
-
-        let detour = winapi_mon_core::fs::hook_CreateFileA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
+            let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+            let detour = detour.read().unwrap();
+            unsafe { detour.enable() };
     */
+    let detour = winapi_mon_core::fileapi::hook_CreateFileA(None,true)?;
+
     event!(Level::INFO, "Initialized the logger!");
 
     //hook directx functions
@@ -651,7 +648,7 @@ fn attached_main() -> anyhow::Result<()> {
         ),
     ]);
     mempatch_map.insert(MemPatchName::HPCapDisable, patch);
-    
+
     //ex cap patch
     let patch = MemPatch::new(&[
         (
@@ -728,7 +725,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangePlayerHP { value } => {
                         if is_in_battle {
                             //      event!(Level::DEBUG, "Change player hp");
-                            unsafe { (*player).current_hp = value };
+                            unsafe {
+                                (*player).current_hp = value;
+                                (*player).graphic_hp_end = value;
+                            };
                         }
                     }
                     ChannelMessage::ChangePlayerEx { value } => {
@@ -753,7 +753,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangeCPUHP { value } => {
                         if is_in_battle {
                             //     event!(Level::DEBUG, "Change cpu hp");
-                            unsafe { (*cpu).current_hp = value };
+                            unsafe {
+                                (*cpu).current_hp = value;
+                                (*cpu).graphic_hp_end = value;
+                            };
                         }
                     }
                     ChannelMessage::ChangeCPUEx { value } => {

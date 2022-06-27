@@ -37,6 +37,9 @@ todo
   
   
 # Change Log
+#### 2022/6/27 12:02
+Smooth graphic upon hp changes with the tool.  
+
 #### 2022/6/26 15:35
 Partially disabled max ex cap.(Unstable. Cause crash sometimes. Probably when ex exceeds 2xxx ~ ?)  
 

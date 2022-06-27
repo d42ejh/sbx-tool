@@ -11,6 +11,7 @@ use imgui_impl_win32_rs::Win32Impl;
 use lazy_static::lazy_static;
 use nameof::{name_of, name_of_type};
 use parking_lot::Mutex;
+use sbx_tool_core::__hook__CreateFileA;
 use sbx_tool_core::battle::BattleContext;
 use sbx_tool_core::css::{CSSContext, CSSInitContextConstantsDetour};
 use sbx_tool_core::utility::mempatch::MemPatch;
@@ -536,7 +537,7 @@ fn attached_main() -> anyhow::Result<()> {
             let detour = detour.read().unwrap();
             unsafe { detour.enable() };
     */
-    let detour = winapi_mon_core::fileapi::hook_CreateFileA(None, true)?;
+    let detour = winapi_mon_core::fileapi::hook_CreateFileA(Some(__hook__CreateFileA), true)?;
 
     event!(Level::INFO, "Initialized the logger!");
 

@@ -17,3 +17,5 @@ nameof = "1.2.2"
 tracing = "0.1.32"
 ilhook = "1.3"
 phf = {version="0.10.1",features=["macros"]}
+
+winapi-mon-core={git="https://github.com/d42ejh/winapi-mon"}

@@ -536,7 +536,7 @@ fn attached_main() -> anyhow::Result<()> {
             let detour = detour.read().unwrap();
             unsafe { detour.enable() };
     */
-    let detour = winapi_mon_core::fileapi::hook_CreateFileA(None,true)?;
+    let detour = winapi_mon_core::fileapi::hook_CreateFileA(None, true)?;
 
     event!(Level::INFO, "Initialized the logger!");
 

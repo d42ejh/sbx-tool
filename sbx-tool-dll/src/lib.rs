@@ -11,6 +11,7 @@ use imgui_impl_win32_rs::Win32Impl;
 use lazy_static::lazy_static;
 use nameof::{name_of, name_of_type};
 use parking_lot::Mutex;
+use sbx_tool_core::__hook__CreateFileA;
 use sbx_tool_core::battle::BattleContext;
 use sbx_tool_core::css::{CSSContext, CSSInitContextConstantsDetour};
 use sbx_tool_core::utility::mempatch::MemPatch;
@@ -311,7 +312,8 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     let mut is_enable_css_disable_cost_patch = css_disable_cost_patch.is_enabled();
     let hp_cap_disable_patch = mem_patches.get(&MemPatchName::HPCapDisable).unwrap();
     let mut is_enable_hp_cap_disable_patch = hp_cap_disable_patch.is_enabled();
-
+    let ex_cap_disable_patch = mem_patches.get(&MemPatchName::ExCapDisable).unwrap();
+    let mut is_enable_ex_cap_disable_patch = ex_cap_disable_patch.is_enabled();
     Window::new("SBX Tool")
         .size([200.0, 400.0], Condition::Once)
         .build(&ui, || {
@@ -454,6 +456,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
                     }
 
                     ui.checkbox("Disable HP Cap", &mut is_enable_hp_cap_disable_patch);
+                    ui.checkbox("Disable Ex Cap", &mut is_enable_ex_cap_disable_patch);
 
 
                 });
@@ -480,6 +483,8 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
     css_disable_cost_patch.switch(is_enable_css_disable_cost_patch);
     let hp_cap_disable_patch = mem_patches.get_mut(&MemPatchName::HPCapDisable).unwrap();
     hp_cap_disable_patch.switch(is_enable_hp_cap_disable_patch);
+    let ex_cap_disable_patch = mem_patches.get_mut(&MemPatchName::ExCapDisable).unwrap();
+    ex_cap_disable_patch.switch(is_enable_ex_cap_disable_patch);
 
     ui
 }
@@ -488,6 +493,7 @@ fn imgui_ui_loop(ui: Ui) -> Ui {
 enum MemPatchName {
     CSSDisableCost,
     HPCapDisable,
+    ExCapDisable,
 }
 
 #[derive(Debug)]
@@ -521,21 +527,18 @@ fn attached_main() -> anyhow::Result<()> {
     }
 
     //winapi stuffs
-    // winapi_mon_core::fs::hook_ReadFile(None)?;
 
     /*
-        let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
+            let detour = winapi_mon_core::fs::hook_GetFinalPathNameByHandleA(None)?;
+            let detour = detour.read().unwrap();
+            unsafe { detour.enable() };
 
-        let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
-
-        let detour = winapi_mon_core::fs::hook_CreateFileA(None)?;
-        let detour = detour.read().unwrap();
-        unsafe { detour.enable() };
+            let detour = winapi_mon_core::memory::hook_LoadLibraryA(None)?;
+            let detour = detour.read().unwrap();
+            unsafe { detour.enable() };
     */
+    let detour = winapi_mon_core::fileapi::hook_CreateFileA(Some(__hook__CreateFileA), true)?;
+
     event!(Level::INFO, "Initialized the logger!");
 
     //hook directx functions
@@ -647,6 +650,19 @@ fn attached_main() -> anyhow::Result<()> {
     ]);
     mempatch_map.insert(MemPatchName::HPCapDisable, patch);
 
+    //ex cap patch
+    let patch = MemPatch::new(&[
+        (
+            module_address + sbx_offset::battle::EXCAP_1_OFFSET,
+            &[0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90],
+        ),
+        (
+            module_address + sbx_offset::battle::EXCAP_2_OFFSET,
+            &[0x90, 0x90, 0x90],
+        ),
+    ]);
+    mempatch_map.insert(MemPatchName::ExCapDisable, patch);
+
     event!(Level::INFO, "Initializing SBX contexts");
     //CSS stuffs
     let css_context_address = module_address + sbx_offset::css::VS_CPU_CSS_CONTEXT_OFFSET;
@@ -710,7 +726,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangePlayerHP { value } => {
                         if is_in_battle {
                             //      event!(Level::DEBUG, "Change player hp");
-                            unsafe { (*player).current_hp = value };
+                            unsafe {
+                                (*player).current_hp = value;
+                                (*player).graphic_hp_end = value;
+                            };
                         }
                     }
                     ChannelMessage::ChangePlayerEx { value } => {
@@ -735,7 +754,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangeCPUHP { value } => {
                         if is_in_battle {
                             //     event!(Level::DEBUG, "Change cpu hp");
-                            unsafe { (*cpu).current_hp = value };
+                            unsafe {
+                                (*cpu).current_hp = value;
+                                (*cpu).graphic_hp_end = value;
+                            };
                         }
                     }
                     ChannelMessage::ChangeCPUEx { value } => {

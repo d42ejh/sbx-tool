@@ -14,7 +14,6 @@ crate-type = ["cdylib"]
 [target.'cfg(windows)'.dependencies]
 sbx-offset={path="../sbx-offset"}
 sbx-tool-core={path="../sbx-tool-core"}
-winapi-mon-core={git="https://github.com/d42ejh/winapi-mon"}
 ansi_term = "0.12.1"
 anyhow = "1.0.56"
 tracing = "0.1.32"
@@ -37,3 +36,7 @@ imgui-winit-support = "0.8"
 ilhook = "1.3"
 
 effbool={git="https://github.com/shiritaino/effbool"}
+
+#use local winapi mon
+#winapi-mon-core={path="../../winapi-mon/winapi-mon-core"}
+winapi-mon-core={git="https://github.com/d42ejh/winapi-mon"}

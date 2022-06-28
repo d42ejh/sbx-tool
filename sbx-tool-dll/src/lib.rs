@@ -735,7 +735,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangePlayerEx { value } => {
                         if is_in_battle {
                             //      event!(Level::DEBUG, "Change player ex");
-                            unsafe { (*player_subparams).current_ex = value };
+                            unsafe {
+                                (*player_subparams).current_ex = value;
+                                (*player_subparams).graphic_ex_end = value;
+                            };
                         }
                     }
                     ChannelMessage::FreezePlayerHP { enable } => {
@@ -763,7 +766,10 @@ fn attached_main() -> anyhow::Result<()> {
                     ChannelMessage::ChangeCPUEx { value } => {
                         if is_in_battle {
                             //      event!(Level::DEBUG, "Change cpu ex");
-                            unsafe { (*cpu_subparams).current_ex = value };
+                            unsafe {
+                                (*cpu_subparams).current_ex = value;
+                                (*cpu_subparams).graphic_ex_end = value;
+                            };
                         }
                     }
                     ChannelMessage::FreezeCPUHP { enable } => {
@@ -796,7 +802,10 @@ fn attached_main() -> anyhow::Result<()> {
                     freeeze_player_hp_value
                 );
                 */
-                unsafe { (*player).current_hp = freeeze_player_hp_value };
+                unsafe {
+                    (*player).current_hp = freeeze_player_hp_value;
+                    (*player).graphic_hp_end = freeeze_player_hp_value;
+                };
             }
 
             if do_freeze_player_ex {
@@ -807,18 +816,27 @@ fn attached_main() -> anyhow::Result<()> {
                     freeeze_player_ex_value
                 );
                 */
-                unsafe { (*player_subparams).current_ex = freeeze_player_ex_value };
+                unsafe {
+                    (*player_subparams).current_ex = freeeze_player_ex_value;
+                    (*player_subparams).graphic_ex_end = freeeze_player_ex_value;
+                };
             }
 
             //cpu freeze
             if do_freeze_cpu_hp {
                 //                event!(Level::DEBUG, "Freeze CPU HP: {}", freeeze_cpu_hp_value);
-                unsafe { (*cpu).current_hp = freeeze_cpu_hp_value };
+                unsafe {
+                    (*cpu).current_hp = freeeze_cpu_hp_value;
+                    (*cpu).graphic_hp_end = freeeze_cpu_hp_value;
+                };
             }
 
             if do_freeze_cpu_ex {
                 //  event!(Level::DEBUG, "Freeze CPU Ex: {}", freeeze_cpu_ex_value);
-                unsafe { (*cpu_subparams).current_ex = freeeze_cpu_ex_value };
+                unsafe {
+                    (*cpu_subparams).current_ex = freeeze_cpu_ex_value;
+                    (*cpu_subparams).graphic_ex_end = freeeze_cpu_ex_value;
+                };
             }
         }
     });

@@ -254,7 +254,7 @@ pub extern "system" fn __hook__CreateFileA(
 
     let name = file_name.to_str().unwrap();
     //log epa file
-    if  name.ends_with(".epa") || name.ends_with(".EPA") {
+    if name.ends_with(".epa") || name.ends_with(".EPA") {
         event!(
             Level::INFO,
             "[{}] {} {:?}, {} {}, {} {}",

@@ -737,7 +737,8 @@ fn attached_main() -> anyhow::Result<()> {
                             //      event!(Level::DEBUG, "Change player ex");
                             unsafe {
                                 (*player_subparams).current_ex = value;
-                                (*player_subparams).graphic_ex_end = value;
+                                (*player_subparams).graphic_ex_end = std::cmp::max(value, 0);
+                                //avoid crash
                             };
                         }
                     }
@@ -768,7 +769,7 @@ fn attached_main() -> anyhow::Result<()> {
                             //      event!(Level::DEBUG, "Change cpu ex");
                             unsafe {
                                 (*cpu_subparams).current_ex = value;
-                                (*cpu_subparams).graphic_ex_end = value;
+                                (*cpu_subparams).graphic_ex_end = std::cmp::max(value, 0);
                             };
                         }
                     }
@@ -818,7 +819,7 @@ fn attached_main() -> anyhow::Result<()> {
                 */
                 unsafe {
                     (*player_subparams).current_ex = freeeze_player_ex_value;
-                    (*player_subparams).graphic_ex_end = freeeze_player_ex_value;
+                    (*player_subparams).graphic_ex_end = std::cmp::max(freeeze_player_ex_value, 0);
                 };
             }
 
@@ -835,7 +836,7 @@ fn attached_main() -> anyhow::Result<()> {
                 //  event!(Level::DEBUG, "Freeze CPU Ex: {}", freeeze_cpu_ex_value);
                 unsafe {
                     (*cpu_subparams).current_ex = freeeze_cpu_ex_value;
-                    (*cpu_subparams).graphic_ex_end = freeeze_cpu_ex_value;
+                    (*cpu_subparams).graphic_ex_end = std::cmp::max(freeeze_cpu_ex_value, 0);
                 };
             }
         }

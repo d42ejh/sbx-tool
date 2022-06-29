@@ -39,10 +39,10 @@ pub struct PlayerClass {
 pub struct PlayerSubParamExClass {
     unk_0: u32,
     unk_4: u32,
-    unk_8: u32,
-    pub current_ex: i32,  //+0c
-    pub graphic_ex1: i32, //+10
-    pub graphic_ex2: i32, //+14
+    max_ex: u32,
+    pub current_ex: i32,       //+0c
+    pub graphic_ex_start: i32, //+10
+    pub graphic_ex_end: i32,   //+14
 }
 
 #[repr(C)]

@@ -37,23 +37,25 @@ todo
   
   
 # Change Log
-#### 2022/6/27 12:02
+#### 2022/6/28
+Smooth graphic upon ex changes with the tool.
+
+#### 2022/6/27
 Smooth graphic upon hp changes with the tool.  
 
-#### 2022/6/26 15:35
+#### 2022/6/26
 Partially disabled max ex cap.(Unstable. Cause crash sometimes. Probably when ex exceeds 2xxx ~ ?)  
 
-#### 2022/6/25 20:15
+#### 2022/6/25
 Partially disabled max hp cap.(Unstable. Cause crash sometimes.)  
 
-
-#### 2022/6/25 13:53
+#### 2022/6/25
 Refactored little.  
 
-#### 2022/6/25 04:25
+#### 2022/6/25
 Refactored little.  
 
-#### 2022/6/16 15:16  
+#### 2022/6/16
 Using a better way to get address of directx functions now.  
 
 #### 2022/05/29

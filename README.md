@@ -20,6 +20,31 @@ Thank you for the high quality libraries.
 Debug dll comes with a debug console.  
 Release dll comes with no debug console and better runtime performance and small binary size.
 
+# 使い方
+自力でインジェクトできる方はお好きな方法でお願いします。
+
+[CheatEngine](https://www.cheatengine.org/downloads.php)
+からチートエンジンをダウンロードします。
+![](ss/j0.png)
+
+ダウンロードした　CheatEnginexx.exe
+を実行(ダブルクリック)してインストールします。
+
+言語選択を迫られるので　English　を選択しましょう。
+![](ss/j1.png)
+
+Okを押して進んでいくと不要なソフトのインストールを何度か訊ねられるので Decline で拒否しましょう。
+![](ss/j3.png)
+
+ウィンドウズディフェンダーが誤検知で勝手にファイルを削除してしまうみたいなので例外に追加して消えないようにしてください。
+
+無事インストールできたらチートエンジンを起動します。
+SBXも起動します。
+
+タイプするのが面倒になったので後は動画を貼っておきます。(すみません)
+![](ss/how2inj.mkv)  
+
+
 ### Debug Console
 ![](ss/dbg_console.png)  
 

@@ -42,7 +42,7 @@ Okを押して進んでいくと不要なソフトのインストールを何度
 SBXも起動します。
 
 タイプするのが面倒になったので後は動画を貼っておきます。(すみません)
-[動画](https://www.youtube.com/watch?v=PFOeAA7IwfA)
+[動画](https://invidious.kavin.rocks/watch?v=PFOeAA7IwfA)
 
 
 ### Debug Console

@@ -42,7 +42,7 @@ Okを押して進んでいくと不要なソフトのインストールを何度
 SBXも起動します。
 
 タイプするのが面倒になったので後は動画を貼っておきます。(すみません)
-![](ss/how2inj.mkv)  
+[動画](https://www.youtube.com/watch?v=PFOeAA7IwfA)
 
 
 ### Debug Console
@@ -103,5 +103,5 @@ Implemented freeze check box for battle hp and ex.
 - [ ] Figure out about 'character context'(where the client holds character informations such as a frame position.) [wip](https://github.com/d42ejh/sbx-tool/blob/450761f4b083f480ac790682bb5e311587863615/sbx-tool-core/src/battle/mod.rs#L50) Need more debug!
 
 # 日本人
-居ないと思いますが機能追加も歓迎です!  
+~~居ないと思いますが~~機能追加も歓迎です!  
   

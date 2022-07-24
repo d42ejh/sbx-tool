@@ -20,6 +20,31 @@ Thank you for the high quality libraries.
 Debug dll comes with a debug console.  
 Release dll comes with no debug console and better runtime performance and small binary size.
 
+# 使い方
+自力でインジェクトできる方はお好きな方法でお願いします。
+
+[CheatEngine](https://www.cheatengine.org/downloads.php)
+からチートエンジンをダウンロードします。
+![](ss/j0.png)
+
+ダウンロードした　CheatEnginexx.exe
+を実行(ダブルクリック)してインストールします。
+
+言語選択を迫られるので　English　を選択しましょう。
+![](ss/j1.png)
+
+Okを押して進んでいくと不要なソフトのインストールを何度か訊ねられるので Decline で拒否しましょう。
+![](ss/j3.png)
+
+ウィンドウズディフェンダーが誤検知で勝手にファイルを削除してしまうみたいなので例外に追加して消えないようにしてください。
+
+無事インストールできたらチートエンジンを起動します。
+SBXも起動します。
+
+タイプするのが面倒になったので後は動画を貼っておきます。(すみません)
+[動画](https://www.youtube.com/watch?v=PFOeAA7IwfA)
+
+
 ### Debug Console
 ![](ss/dbg_console.png)  
 
@@ -78,5 +103,5 @@ Implemented freeze check box for battle hp and ex.
 - [ ] Figure out about 'character context'(where the client holds character informations such as a frame position.) [wip](https://github.com/d42ejh/sbx-tool/blob/450761f4b083f480ac790682bb5e311587863615/sbx-tool-core/src/battle/mod.rs#L50) Need more debug!
 
 # 日本人
-居ないと思いますが機能追加も歓迎です!  
+~~居ないと思いますが~~機能追加も歓迎です!  
   
